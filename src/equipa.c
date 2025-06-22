@@ -15,7 +15,7 @@ Equipa* criar_equipa(ListaEquipas* lista, const char* nome, TipoEquipa tipo) {
     nova->membros = NULL;
     nova->prox = lista->lista;
     lista->lista = nova;
-
+    salvar_todas_equipas(lista);
     return nova;
 }
 
@@ -42,7 +42,6 @@ int adicionar_membro_equipa(Equipa* e, const char* email) {
     strcpy(novo->email, email);
     novo->prox = e->membros;
     e->membros = novo;
-
     return 1;
 }
 
@@ -83,3 +82,47 @@ void imprimir_equipas(ListaEquipas* lista) {
         e = e->prox;
     }
 }
+
+void carregar_equipas(ListaEquipas* lista) {
+    FILE* f = fopen("data/equipas.txt", "r");
+    if (!f) return;
+
+    char linha[512];
+    while (fgets(linha, sizeof(linha), f)) {
+        char nome[100];
+        int tipo;
+        char* token = strtok(linha, " ");
+        strcpy(nome, token);
+
+        token = strtok(NULL, " ");
+        tipo = atoi(token);
+
+        Equipa* e = criar_equipa(lista, nome, tipo);
+
+        // Adicionar membros
+        while ((token = strtok(NULL, " \n")) != NULL) {
+            adicionar_membro_equipa(e, token);
+        }
+    }
+
+    fclose(f);
+}
+void salvar_todas_equipas(ListaEquipas* lista) {
+    FILE* f = fopen("data/equipas.txt", "w");
+    if (!f) return;
+
+    Equipa* e = lista->lista;
+    while (e) {
+        fprintf(f, "%s %d", e->nome, e->tipo);
+        MembroEquipa* m = e->membros;
+        while (m) {
+            fprintf(f, " %s", m->email);
+            m = m->prox;
+        }
+        fprintf(f, "\n");
+        e = e->prox;
+    }
+
+    fclose(f);
+}
+

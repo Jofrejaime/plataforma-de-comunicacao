@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <dirent.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 
 #ifdef _WIN32
@@ -38,5 +41,6 @@ Vertice* adicionar_vertice(Grafo* g, const char* id);
 int adicionar_aresta(Grafo* g, const char* origem, const char* destino, const char* conteudo);
 void imprimir_grafo(Grafo* g);
 int registrar_comunicacao(Grafo* g, const char* origem, const char* destino, const char* conteudo);
+void carregar_mensagens_para_grafo(Grafo* g, const char* pasta_mensagens);
 
 #endif

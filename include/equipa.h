@@ -34,5 +34,6 @@ int adicionar_membro_equipa(Equipa* e, const char* email);
 int remover_membro_equipa(Equipa* e, const char* email);
 void listar_membros_equipa(Equipa* e);
 void imprimir_equipas(ListaEquipas* lista);
-
+void carregar_equipas(ListaEquipas* lista);
+void salvar_todas_equipas(ListaEquipas* lista);
 #endif

@@ -69,22 +69,21 @@ void imprimir_grafo(Grafo* g) {
 }
 
 int registrar_comunicacao(Grafo* g, const char* origem, const char* destino, const char* conteudo) {
-    verificar_ou_criar_pasta_mensagens();
+    // Verifica ou adiciona vértices
     Vertice* v_origem = buscar_vertice(g, origem);
     if (!v_origem) v_origem = adicionar_vertice(g, origem);
 
     Vertice* v_destino = buscar_vertice(g, destino);
     if (!v_destino) v_destino = adicionar_vertice(g, destino);
 
-    // Verifica se já existe ligação entre origem → destino
+    // Verifica se a aresta já existe
     Aresta* atual = v_origem->lista_adj;
     while (atual) {
-        if (strcmp(atual->destino, destino) == 0)
-            break;
+        if (strcmp(atual->destino, destino) == 0) break;
         atual = atual->prox;
     }
 
-    // Só adiciona aresta se ainda não existir
+    // Se ainda não existe, adiciona a aresta
     if (!atual) {
         Aresta* nova = (Aresta*)malloc(sizeof(Aresta));
         strcpy(nova->destino, destino);
@@ -93,33 +92,72 @@ int registrar_comunicacao(Grafo* g, const char* origem, const char* destino, con
         v_origem->lista_adj = nova;
     }
 
-    // Gera data/hora atual
+    // Gera linha com data e hora
     char linha[512];
     time_t agora = time(NULL);
     struct tm* tempo = localtime(&agora);
     char datahora[64];
     strftime(datahora, sizeof(datahora), "%Y-%m-%d %H:%M", tempo);
-
     snprintf(linha, sizeof(linha), "%s - ori: %s des: %s - %s\n", datahora, origem, destino, conteudo);
 
-    // Criar caminho do ficheiro: mensagens/origem.txt
-    char path_origem[150];
-    char path_destino[150];
+    // Grava em ficheiros
+    if (strchr(destino, '@') == NULL) {
+        // 📌 destino é uma equipa (não contém '@')
+        char path[150];
+        snprintf(path, sizeof(path), "mensagens/%s.txt", destino);
+        FILE* f = fopen(path, "a");
+        if (f) {
+            fputs(linha, f);
+            fclose(f);
+        }
+    } else {
+        // 📌 destino é um membro
+        char path_origem[150], path_destino[150];
+        snprintf(path_origem, sizeof(path_origem), "mensagens/%s.txt", origem);
+        snprintf(path_destino, sizeof(path_destino), "mensagens/%s.txt", destino);
 
-    snprintf(path_origem, sizeof(path_origem), "mensagens/%s.txt", origem);
-    snprintf(path_destino, sizeof(path_destino), "mensagens/%s.txt", destino);
+        FILE* f1 = fopen(path_origem, "a");
+        if (f1) { fputs(linha, f1); fclose(f1); }
 
-    FILE* f_origem = fopen(path_origem, "a");
-    if (f_origem) {
-        fputs(linha, f_origem);
-        fclose(f_origem);
-    }
-
-    FILE* f_destino = fopen(path_destino, "a");
-    if (f_destino) {
-        fputs(linha, f_destino);
-        fclose(f_destino);
+        FILE* f2 = fopen(path_destino, "a");
+        if (f2) { fputs(linha, f2); fclose(f2); }
     }
 
     return 1;
 }
+void carregar_mensagens_para_grafo(Grafo* g, const char* pasta_mensagens) {
+    DIR* dir = opendir(pasta_mensagens);
+    if (!dir) {
+        printf("Erro: pasta %s não encontrada.\n", pasta_mensagens);
+        return;
+    }
+
+    struct dirent* ent;
+    char path[256];
+    char linha[512];
+
+    while ((ent = readdir(dir)) != NULL) {
+        if (ent->d_type == DT_REG && strstr(ent->d_name, ".txt")) {
+            snprintf(path, sizeof(path), "%s/%s", pasta_mensagens, ent->d_name);
+
+            FILE* f = fopen(path, "r");
+            if (!f) continue;
+
+            while (fgets(linha, sizeof(linha), f)) {
+                char data[11], hora[6], ori[100], des[100], msg[256];
+
+                int lidos = sscanf(linha, "%10s %5s - ori: %99[^ ] des: %99[^ ] - %[^\n]",
+                                   data, hora, ori, des, msg);
+
+                if (lidos == 5) {
+                    adicionar_aresta(g, ori, des, msg); // só cria ligação se não existir
+                }
+            }
+
+            fclose(f);
+        }
+    }
+
+    closedir(dir);
+}
+

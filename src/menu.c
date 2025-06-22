@@ -1,5 +1,4 @@
 #include "menu.h"
-#include "app.h"
 
 void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* eqs) {
     int opcao;
@@ -22,15 +21,15 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
             destino[strcspn(destino, "\n")] = 0;
 
             if (buscar_equipa(eqs, destino)) {
-                listar_mensagens_comuns(usuario, destino); // histórico da equipa
+                listar_mensagens_comuns(usuario, destino, true); // histórico da equipa
 
                 printf("\nNova mensagem para equipa: ");
                 fgets(conteudo, sizeof(conteudo), stdin);
                 conteudo[strcspn(conteudo, "\n")] = 0;
 
                 enviar_mensagem_para_equipa(ht, g, eqs, usuario, destino, conteudo);
-            } else {
-                listar_mensagens_comuns(usuario, destino); // histórico com pessoa
+            } else if(buscar_membro(ht, destino)){
+                listar_mensagens_comuns(usuario, destino, false); // histórico com pessoa
 
                 printf("\nNova mensagem: ");
                 fgets(conteudo, sizeof(conteudo), stdin);
@@ -38,7 +37,10 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
 
                 enviar_mensagem(ht, g, usuario, destino, conteudo);
             }
-
+            else{
+                printf("Erro: destinatario não encontrado.\n");
+                continue;
+            }
         } else if (opcao == 2) {
             menu_equipas_membro(usuario, m->tipo, eqs);
         } else if (opcao != 0) {
@@ -65,6 +67,7 @@ void menu_login(HashTable* ht, Grafo* g, ListaEquipas* eqs) {
     scanf("%s", email);
     printf("Senha: ");
     scanf("%s", senha);
+    getchar(); // limpa ENTER do buffer
 
     Membro* m = buscar_membro(ht, email);
     if (m && strcmp(m->senha, senha) == 0 && m->ativo) {
@@ -142,7 +145,10 @@ void menu_admin(HashTable* ht, ListaEquipas* eqs) {
 
                     if (e && m && m->ativo) {
                         if (adicionar_membro_equipa(e, email))
+                        {
                             printf("Membro adicionado com sucesso!\n");
+                             salvar_todas_equipas(eqs);
+                        }
                         else
                             printf("Membro já está na equipa.\n");
                     } else {
@@ -164,7 +170,9 @@ void menu_admin(HashTable* ht, ListaEquipas* eqs) {
                     Equipa* e = buscar_equipa(eqs, nome_equipa);
                     if (e) {
                         if (remover_membro_equipa(e, email))
+                        {                                                   salvar_todas_equipas(eqs);
                             printf("Membro removido com sucesso!\n");
+                        }
                         else
                             printf("Membro não encontrado na equipa.\n");
                     } else {

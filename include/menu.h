@@ -5,6 +5,7 @@
 #include "equipa.h"
 #include "membro.h"
 #include "hash.h"
+#include "app.h"
 
 void mostrar_menu_principal();
 void menu_login(HashTable* ht, Grafo* g, ListaEquipas* eqs);

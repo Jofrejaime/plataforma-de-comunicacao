@@ -2,11 +2,16 @@
 #include "hash.h"
 #include "grafo.h"
 #include "equipa.h"
+#include "app.h"
 
 int main() {
+    verificar_ou_criar_pasta_data();
     HashTable* ht = criar_hash();
     Grafo* g = criar_grafo();
+    carregar_mensagens_para_grafo(g, "mensagens");
     ListaEquipas* eqs = criar_lista_equipas();
+    carregar_membros(ht);
+    carregar_equipas(eqs);
     int opcao;
 
     do {

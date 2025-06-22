@@ -3,6 +3,8 @@
     "*.embeddedhtml": "html",
     "*.dbclient-js": "javascript",
     "hash.h": "c",
-    "stdbool.h": "c"
+    "stdbool.h": "c",
+    "time.h": "c",
+    "app.h": "c"
   }
 }
