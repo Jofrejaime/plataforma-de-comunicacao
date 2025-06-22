@@ -3,8 +3,12 @@
 
 #include <stdbool.h>
 #include "hash.h"
+#include "grafo.h"
+#include <ctype.h>
 
 bool login(HashTable* ht, char* email, char* senha);
 bool registrar(HashTable* ht, const char* email, const char* senha, TipoMembro tipo);
+bool enviar_mensagem(HashTable* ht, Grafo* g, const char* origem, const char* destino, const char* conteudo);
+void listar_mensagens_comuns(const char* origem, const char* destino);
 
 #endif

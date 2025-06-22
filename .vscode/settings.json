@@ -2,6 +2,7 @@
   "files.associations": {
     "*.embeddedhtml": "html",
     "*.dbclient-js": "javascript",
-    "hash.h": "c"
+    "hash.h": "c",
+    "stdbool.h": "c"
   }
 }
