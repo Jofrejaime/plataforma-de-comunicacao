@@ -1,6 +1,8 @@
 #include "menu.h"
 #include "hash.h"
 #include "grafo.h"
+#include "equipa.h"
+
 
 int main() {
     HashTable* ht = criar_hash();

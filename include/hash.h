@@ -12,7 +12,6 @@ typedef struct {
     Membro* tabela[TAM_HASH];
 } HashTable;
 
-// Funções públicas
 HashTable* criar_hash();
 int hash(const char* email);
 int inserir_membro(HashTable* ht, Membro* novo);
