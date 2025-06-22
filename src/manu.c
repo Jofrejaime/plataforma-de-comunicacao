@@ -1,7 +1,7 @@
 #include "menu.h"
 #include "app.h"
 
-void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario) {
+void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* eqs) {
     int opcao;
     char destino[100], conteudo[256];
 
@@ -19,26 +19,28 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario) {
         if (opcao == 1) {
             printf("Destino (email ou equipa): ");
             fgets(destino, sizeof(destino), stdin);
-          if (buscar_equipa(equipas_globais, destino)) {
-            listar_mensagens_comuns(usuario, destino); // histórico da equipa
+            destino[strcspn(destino, "\n")] = 0;
 
-            printf("\nNova mensagem para equipa: ");
-            fgets(conteudo, sizeof(conteudo), stdin);
-            conteudo[strcspn(conteudo, "\n")] = 0;
+            if (buscar_equipa(eqs, destino)) {
+                listar_mensagens_comuns(usuario, destino); // histórico da equipa
 
-            enviar_mensagem_para_equipa(ht, g, equipas_globais, usuario, destino, conteudo);
-        } else {
-            listar_mensagens_comuns(usuario, destino); // histórico com pessoa
+                printf("\nNova mensagem para equipa: ");
+                fgets(conteudo, sizeof(conteudo), stdin);
+                conteudo[strcspn(conteudo, "\n")] = 0;
 
-            printf("\nNova mensagem: ");
-            fgets(conteudo, sizeof(conteudo), stdin);
-            conteudo[strcspn(conteudo, "\n")] = 0;
+                enviar_mensagem_para_equipa(ht, g, eqs, usuario, destino, conteudo);
+            } else {
+                listar_mensagens_comuns(usuario, destino); // histórico com pessoa
 
-            enviar_mensagem(ht, g, usuario, destino, conteudo);
-        }
+                printf("\nNova mensagem: ");
+                fgets(conteudo, sizeof(conteudo), stdin);
+                conteudo[strcspn(conteudo, "\n")] = 0;
+
+                enviar_mensagem(ht, g, usuario, destino, conteudo);
+            }
 
         } else if (opcao == 2) {
-            menu_equipas_membro(usuario, m->tipo, equipas_globais);
+            menu_equipas_membro(usuario, m->tipo, eqs);
         } else if (opcao != 0) {
             printf("Opção inválida.\n");
         }
@@ -56,7 +58,7 @@ void mostrar_menu_principal() {
     printf("Escolha uma opção: ");
 }
 
-void menu_login(HashTable* ht, Grafo* g) {
+void menu_login(HashTable* ht, Grafo* g, ListaEquipas* eqs) {
     char email[100], senha[50];
     printf("\n--- Login ---\n");
     printf("Email: ");
@@ -64,8 +66,17 @@ void menu_login(HashTable* ht, Grafo* g) {
     printf("Senha: ");
     scanf("%s", senha);
 
-    if (login(ht, email, senha)) {
-        menu_mensagens(ht, g, email); // entra na plataforma
+    Membro* m = buscar_membro(ht, email);
+    if (m && strcmp(m->senha, senha) == 0 && m->ativo) {
+        printf("Login bem-sucedido!\n");
+
+        if (m->tipo == ADMIN) {
+            menu_admin(ht, eqs);
+        } else {
+            menu_mensagens(ht, g, email, eqs);
+        }
+    } else {
+        printf("Login falhou.\n");
     }
 }
 

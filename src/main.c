@@ -3,10 +3,10 @@
 #include "grafo.h"
 #include "equipa.h"
 
-
 int main() {
     HashTable* ht = criar_hash();
-    Grafo *g = criar_grafo();
+    Grafo* g = criar_grafo();
+    ListaEquipas* eqs = criar_lista_equipas();
     int opcao;
 
     do {
@@ -15,7 +15,7 @@ int main() {
 
         switch (opcao) {
             case 1:
-                menu_login(ht, g);
+                menu_login(ht, g, eqs);
                 break;
             case 2:
                 menu_registro(ht);
