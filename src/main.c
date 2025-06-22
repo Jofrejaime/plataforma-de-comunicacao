@@ -1,30 +1,12 @@
-#include <stdio.h>
-#include "menu.h"
-#include "hash.h"
+#include "grafo.h"
 
 int main() {
-    HashTable* ht = criar_hash();
-    int opcao;
+    Grafo* g = criar_grafo();
 
-    do {
-        mostrar_menu_principal();
-        scanf("%d", &opcao);
+    adicionar_aresta(g, "admin@email.com", "user@email.com", "Olá, tudo bem?");
+    adicionar_aresta(g, "user@email.com", "Equipa_Dev", "Enviei o relatório.");
+    adicionar_aresta(g, "Equipa_Dev", "user@email.com", "Recebido!");
 
-        switch (opcao) {
-            case 1:
-                menu_login(ht);
-                break;
-            case 2:
-                menu_registro(ht);
-                break;
-            case 0:
-                printf("Saindo...\n");
-                break;
-            default:
-                printf("Opção inválida.\n");
-        }
-
-    } while (opcao != 0);
-
+    imprimir_grafo(g);
     return 0;
 }
