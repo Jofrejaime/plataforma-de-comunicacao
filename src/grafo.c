@@ -102,7 +102,7 @@ int registrar_comunicacao(Grafo* g, const char* origem, const char* destino, con
 
     // Grava em ficheiros
     if (strchr(destino, '@') == NULL) {
-        // 📌 destino é uma equipa (não contém '@')
+        //destino é uma equipa (não contém '@')
         char path[150];
         snprintf(path, sizeof(path), "mensagens/%s.txt", destino);
         FILE* f = fopen(path, "a");
@@ -137,7 +137,7 @@ void carregar_mensagens_para_grafo(Grafo* g, const char* pasta_mensagens) {
     char linha[512];
 
     while ((ent = readdir(dir)) != NULL) {
-        if (ent->d_type == DT_REG && strstr(ent->d_name, ".txt")) {
+        if (strstr(ent->d_name, ".txt")) {
             snprintf(path, sizeof(path), "%s/%s", pasta_mensagens, ent->d_name);
 
             FILE* f = fopen(path, "r");

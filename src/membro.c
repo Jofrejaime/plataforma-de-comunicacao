@@ -7,6 +7,9 @@ Membro* criar_membro(const char* email, const char* senha, TipoMembro tipo) {
     strcpy(novo->senha, senha);
     novo->tipo = tipo;
     novo->ativo = 1;
+    novo->permisao[0] = 1;
+    novo->permisao[1] = 1;
+    novo->permisao[2] = 1;
     novo->documentos = NULL;
     novo->prox = NULL;
     return novo;

@@ -1,19 +1,28 @@
 #include "app.h"
 
 bool registrar(HashTable* ht, const char* email, const char* senha, TipoMembro tipo) {
+	
+	if(!strchr(email, '@')){
+		printf("Email inválido!\n");
+		Sleep(3000);
+		return false;
+	}
     if (buscar_membro(ht, email)) {
         printf("Email já cadastrado!\n");
+        Sleep(3000);
         return false;
     }
 
     Membro* novo = criar_membro(email, senha, tipo);
     if (!novo || !inserir_membro(ht, novo)) {
         printf("Erro ao cadastrar!\n");
+        Sleep(3000);
         return false;
     }
 
     printf("Membro cadastrado com sucesso!\n");
     salvar_membro_em_ficheiro(novo);
+    Sleep(3000);
     return true;
 }
 
@@ -171,7 +180,6 @@ bool enviar_mensagem_para_equipa(HashTable* ht, Grafo* g, ListaEquipas* eqs, con
     return false;
 }
 
-
 void salvar_membro_em_ficheiro(Membro* m) {
     FILE* f = fopen("data/membros.txt", "a");
     if (f) {
@@ -196,6 +204,61 @@ void carregar_membros(HashTable* ht) {
     fclose(f);
 }
 
+void	listar_permisao(Membro *m, char **permissao){
+	printf("Permisoes do colaborador %s\n",m->email);
+	for(int i = 0; i < 3; i++)
+		if(m->permisao[i] == 1)
+		printf("%s : activo!\n", permissao[i]);
+		else
+		printf("%s : desativado\n", permissao[i]);
+}
+
+void	actualizar_permissao(HashTable *ht, const char *email)
+{
+	char	*permissoes[3] = {"Adicionar", "Excluir", "Convidar"};
+	int select = 0, teclas = 0;
+	
+	Membro *m = buscar_membro(ht, email);
+	
+	if(!m){
+		printf("Este usuário não existe!\n");
+		return ;
+	}
+	
+	
+	while (1){
+		system("cls");
+	listar_permisao(m, permissoes);
+	
+		printf("\n----------------------------------------\n");
+		for (int i = 0; i < 3; i++){
+			if (i == select) printf(">> %s\n", permissoes[i]);
+			else printf(" %s\n", permissoes[i]);
+		}
+		
+		teclas = _getch();// lê um primeiro valor ( 0 ou 224) só depois lê o valor da tecla
+		
+		if(teclas == 224){
+			teclas = _getch();
+			if(teclas == 72)select = (select - 1) % 3;
+			if(teclas = 80)select = (select + 1) % 3;
+		}else if(teclas == 13)
+		{
+			if(select == 0)select = 1;
+			else if(select == 1)select = 2;
+			else if(select == 2)select = 0;
+			break;
+		}
+	}
+	
+	if(m->permisao[select] == 0){
+		m->permisao[select] = 1;
+		printf("Operação realizada com sucesso!\n o colaborador %s já pode %s", m->email, permissoes[select]);
+	}else if(m->permisao[select] == 1){
+		m->permisao[select] = 0;
+		printf("Operação realizada com sucesso!\n o colaborador %s já não pode %s", m->email, permissoes[select]);
+	}
+}
 void verificar_ou_criar_pasta_data() {
 #ifdef _WIN32
     _mkdir("data");

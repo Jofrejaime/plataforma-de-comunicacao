@@ -21,6 +21,7 @@ typedef struct Membro {
     char senha[50];
     TipoMembro tipo;
     int ativo;
+    int permisao[3];
     Documento* documentos;
     struct Membro* prox; // para encadeamento da hash
 } Membro;

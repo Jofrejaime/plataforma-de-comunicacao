@@ -52,12 +52,31 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
     printf("Saindo da plataforma...\n");
 }
 
-void mostrar_menu_principal() {
-    printf("\n=== Plataforma de Comunicação ===\n");
-    printf("1. Login\n");
-    printf("2. Registrar\n");
-    printf("0. Sair\n");
-    printf("Escolha uma opção: ");
+int mostrar_menu_principal() {
+	char *opcs[] = {"1. -Login", "2. Registrar", " 0. Sair"};
+	int select = 0,  teclas;
+	
+	while (1){
+		system("cls");
+		for (int i = 0; i < 3; i++){
+			if (i == select) printf(">> %s\n", opcs[i]);
+			else printf(" %s\n", opcs[i]);
+		}
+		
+		teclas = _getch();// lê um primeiro valor ( 0 ou 224) só depois lê o valor da tecla
+		
+		if(teclas == 224){
+			teclas = _getch();
+			if(teclas == 72)select = (select - 1) % 3;
+			if(teclas = 80)select = (select + 1) % 3;
+		}else if(teclas == 13)
+		{
+			if(select == 0)select = 1;
+			else if(select == 1)select = 2;
+			else if(select == 2)select = 0;
+			return (select);
+		}
+	}	
 }
 
 void menu_login(HashTable* ht, Grafo* g, ListaEquipas* eqs) {
@@ -72,7 +91,7 @@ void menu_login(HashTable* ht, Grafo* g, ListaEquipas* eqs) {
     Membro* m = buscar_membro(ht, email);
     if (m && strcmp(m->senha, senha) == 0 && m->ativo) {
         printf("Login bem-sucedido!\n");
-
+        Sleep(3000);
         if (m->tipo == ADMIN) {
             menu_admin(ht, eqs);
         } else {
@@ -80,6 +99,7 @@ void menu_login(HashTable* ht, Grafo* g, ListaEquipas* eqs) {
         }
     } else {
         printf("Login falhou.\n");
+        Sleep(3000);
     }
 }
 
@@ -108,7 +128,8 @@ void menu_admin(HashTable* ht, ListaEquipas* eqs) {
         printf("1. Criar equipa\n");
         printf("2. Adicionar membro a equipa\n");
         printf("3. Remover membro de equipa\n");
-        printf("4. Listar equipas\n");
+        printf("4. Actualizar permissoes\n");
+        printf("5. Listar equipas\n");
         printf("0. Voltar\n");
         printf("Escolha: ");
         scanf("%d", &opcao);
@@ -182,9 +203,13 @@ void menu_admin(HashTable* ht, ListaEquipas* eqs) {
                 break;
 
             case 4:
-                imprimir_equipas(eqs);
+                printf("Informe o email do user : ");
+                scanf("%s",email);
+                actualizar_permissao(ht, email);
                 break;
-
+			case 5:
+				imprimir_equipas(eqs);
+				break;
             case 0:
                 printf("Voltando ao menu anterior...\n");
                 break;
