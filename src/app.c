@@ -211,6 +211,7 @@ void	listar_permisao(Membro *m, char **permissao){
 		printf("%s : activo!\n", permissao[i]);
 		else
 		printf("%s : desativado\n", permissao[i]);
+	// printf("%s : %s\n", premissao[i], m-premissao[i]==1? "ativo":"desativado"); mais simples
 }
 
 void	actualizar_permissao(HashTable *ht, const char *email)
