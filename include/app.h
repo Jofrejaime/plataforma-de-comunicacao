@@ -23,5 +23,6 @@ void 	verificar_ou_criar_pasta_data();
 void 	salvar_membro_em_ficheiro(Membro* m);
 void	actualizar_permissao(HashTable *ht, const char *email);
 void	listar_permisao(Membro *m, char **permissao);
+int	ft_strlen(char **pt);
 
 #endif

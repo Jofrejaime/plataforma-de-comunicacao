@@ -15,5 +15,6 @@ void menu_registro(HashTable* ht);
 void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* eqs);
 void menu_admin(HashTable* ht, ListaEquipas* eqs);
 void menu_equipas_membro(const char* email, TipoMembro tipo, ListaEquipas* eqs);
+int	menu_iterativo(char **opcs);
 
 #endif

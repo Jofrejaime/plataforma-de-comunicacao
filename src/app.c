@@ -105,21 +105,25 @@ bool enviar_mensagem(HashTable* ht, Grafo* g, const char* origem, const char* de
     Membro* remetente = buscar_membro(ht, origem);
     if (!remetente || !remetente->ativo) {
         printf("Erro: remetente inválido ou desativado.\n");
+    	Sleep(3000);
         return false;
     }
 
     Membro* receptor = buscar_membro(ht, destino);
     if (!receptor && !buscar_vertice(g, destino)) {
         printf("Erro: destino inexistente.\n");
+        Sleep(3000);
         return false;
     }
 
     if (registrar_comunicacao(g, origem, destino, conteudo)) {
         printf("Mensagem enviada e registrada com sucesso.\n");
+        Sleep(3000);
         return true;
     }
 
     printf("Erro ao registrar mensagem.\n");
+	Sleep(3000);
     return false;
 }
 
@@ -138,6 +142,7 @@ bool login(HashTable* ht, Grafo* g, ListaEquipas* eqs, char* email, char* senha)
     }
 
     printf("Login falhou. Verifique email, senha ou estado da conta.\n");
+        	Sleep(3000);
     return false;
 }
 
@@ -145,6 +150,7 @@ bool enviar_mensagem_para_equipa(HashTable* ht, Grafo* g, ListaEquipas* eqs, con
     Equipa* e = buscar_equipa(eqs, nome_equipa);
     if (!e) {
         printf("Erro: equipa não existe.\n");
+            	Sleep(3000);
         return false;
     }
 
@@ -167,16 +173,19 @@ bool enviar_mensagem_para_equipa(HashTable* ht, Grafo* g, ListaEquipas* eqs, con
 
     if (!permitido) {
         printf("Acesso negado: você não pertence à equipa.\n");
+            	Sleep(3000);
         return false;
     }
 
     // ✅ Esta função já grava no ficheiro e adiciona a ligação no grafo
     if (registrar_comunicacao(g, origem, nome_equipa, conteudo)) {
         printf("Mensagem enviada para a equipa %s.\n", nome_equipa);
+            	Sleep(3000);
         return true;
     }
 
     printf("Erro ao registrar a comunicação.\n");
+        	Sleep(3000);
     return false;
 }
 
@@ -215,7 +224,7 @@ void	listar_permisao(Membro *m, char **permissao){
 
 void	actualizar_permissao(HashTable *ht, const char *email)
 {
-	char	*permissoes[3] = {"Adicionar", "Excluir", "Convidar"};
+	char	*permissoes[] = {"1. Adicionar", "2. Excluir", "3 .Convidar", "4. voltar", NULL};
 	int select = 0, teclas = 0;
 	
 	Membro *m = buscar_membro(ht, email);
@@ -225,39 +234,23 @@ void	actualizar_permissao(HashTable *ht, const char *email)
 		return ;
 	}
 	
-	
-	while (1){
-		system("cls");
-	listar_permisao(m, permissoes);
-	
-		printf("\n----------------------------------------\n");
-		for (int i = 0; i < 3; i++){
-			if (i == select) printf(">> %s\n", permissoes[i]);
-			else printf(" %s\n", permissoes[i]);
-		}
-		
-		teclas = _getch();// lê um primeiro valor ( 0 ou 224) só depois lê o valor da tecla
-		
-		if(teclas == 224){
-			teclas = _getch();
-			if(teclas == 72)select = (select - 1) % 3;
-			if(teclas = 80)select = (select + 1) % 3;
-		}else if(teclas == 13)
-		{
-			if(select == 0)select = 1;
-			else if(select == 1)select = 2;
-			else if(select == 2)select = 0;
-			break;
-		}
-	}
-	
+	select = menu_iterativo(permissoes);
 	if(m->permisao[select] == 0){
 		m->permisao[select] = 1;
 		printf("Operação realizada com sucesso!\n o colaborador %s já pode %s", m->email, permissoes[select]);
+		    	Sleep(3000);
 	}else if(m->permisao[select] == 1){
 		m->permisao[select] = 0;
 		printf("Operação realizada com sucesso!\n o colaborador %s já não pode %s", m->email, permissoes[select]);
+		    	Sleep(3000);
 	}
+}
+
+int	ft_strlen(char *pt[]){
+	int i = 0;
+	while(pt[i])
+		i++;
+	return (i);
 }
 void verificar_ou_criar_pasta_data() {
 #ifdef _WIN32
