@@ -7,6 +7,8 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
         "1. Enviar mensagem",
         "2. Ver equipas",
         "3. Enviar documento",
+        "4. Listar meus documentos",
+        "5. Visualizar meu perfil",
         "0. Sair",
         NULL
     };
@@ -53,13 +55,42 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
             destino[strcspn(destino, "\n")] = 0;
             bool is_equipa = buscar_equipa(eqs, destino) != NULL;
             if (is_equipa || buscar_membro(ht, destino)) {
-                enviar_documento(usuario, destino, is_equipa);
+                enviar_documento(usuario, destino);
                 printf("Documento enviado!\n");
             } else {
                 printf("Erro: destinatário não encontrado.\n");
                 Sleep(3000);
                 getch();
             }
+        } else if (opcao == 4) {
+            listar_documentos(usuario);
+            printf("Pressione qualquer tecla para voltar ao menu...");
+            getch();
+        } else if (opcao == 5) {
+            printf("\n--- Meu Perfil ---\n");
+            printf("Email: %s\n", m->email);
+            printf("Tipo: %s\n", m->tipo == 0 ? "ADMIN" : (m->tipo == 1 ? "CORPORATIVO" : "CONVIDADO"));
+            printf("Equipas: ");
+            int encontrou = 0;
+            Equipa* eq = eqs->lista;
+            while (eq) {
+                MembroEquipa* me = eq->membros;
+                while (me) {
+                    if (strcmp(me->email, m->email) == 0) {
+                        printf("%s ", eq->nome);
+                        encontrou = 1;
+                        break;
+                    }
+                    me = me->prox;
+                }
+                eq = eq->prox;
+            }
+            if (!encontrou) printf("(Nenhuma)\n");
+            else printf("\n");
+            printf("Documentos:\n");
+            listar_documentos(m->email);
+            printf("Pressione qualquer tecla para voltar ao menu...");
+            getch();
         } else if (opcao == 0) {
             printf("Voltando ao menu principal...\n");
         } else if (opcao != 0) {

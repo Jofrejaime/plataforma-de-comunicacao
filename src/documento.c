@@ -21,17 +21,18 @@ void listar_documentos(const char* email) {
         return;
     }
     char linha[512];
-    printf("Documentos de %s:\n", email);
+    printf("%-10s | %-30s | %-12s | %s\n", "TIPO", "PARTICIPANTE", "DATA", "ARQUIVO");
+    printf("--------------------------------------------------------------------------------\n");
     while (fgets(linha, sizeof(linha), f)) {
         char tipo[16], participante[100], data[32], nome_arquivo[128];
         if (sscanf(linha, "%15[^;];%99[^;];%31[^;];%127[^\n]", tipo, participante, data, nome_arquivo) == 4) {
-            printf("%s | %s | %s | %s\n", tipo, participante, data, nome_arquivo);
+            printf("%-10s | %-30s | %-12s | %s\n", tipo, participante, data, nome_arquivo);
         }
     }
     fclose(f);
 }
 
-void enviar_documento(const char* remetente, const char* destino, bool destino_e_equipa) {
+void enviar_documento(const char* remetente, const char* destino) {
     if (!remetente || !destino) return;
     char pasta[100];
     snprintf(pasta, sizeof(pasta), "documentos/%s", remetente);

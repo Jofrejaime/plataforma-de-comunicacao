@@ -18,7 +18,7 @@ void registrar_documento(const char* email, const char* tipo, const char* partic
 void listar_documentos(const char* email);
 
 // Envia documento para um membro ou equipa
-void enviar_documento(const char* remetente, const char* destino, bool destino_e_equipa);
+void enviar_documento(const char* remetente, const char* destino);
 
 // Função utilitária para criar/verificar pasta
 void verificar_ou_criar_pasta(const char* nome_pasta);
