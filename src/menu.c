@@ -6,8 +6,8 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
     char *opcs[] = {
         "1. Enviar mensagem",
         "2. Ver equipas",
-        "0. Sair",
         "3. Enviar documento",
+        "0. Sair",
         NULL
     };
     Membro* m = buscar_membro(ht, usuario);
@@ -71,7 +71,7 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
 }
 
 int mostrar_menu_principal() {
-	char *opcs[] = {"1. -Login", "2. Registrar", " 0. Sair", NULL};
+	char *opcs[] = {"1. Login", "2. Registrar", "0. Sair", NULL};
 	return (menu_iterativo(opcs));
 }
 
@@ -293,7 +293,11 @@ int	menu_iterativo(char **opcs)
 			if(teclas == 80)select = (select + 1) % size;
 			if(select == -1)select = size - 1;
 		}else if(teclas == 13)// Enter
+        {
+          if (select == size - 1) select = 0;
+            else select += 1;
 			return (select);
+        }
 		
 	}	
 }

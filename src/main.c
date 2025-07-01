@@ -3,8 +3,10 @@
 #include "grafo.h"
 #include "equipa.h"
 #include "app.h"
+#include <locale.h>
 
 int main() {
+    setlocale(LC_ALL, "pt_PT.UTF-8");
     verificar_ou_criar_pasta_data();
     verificar_ou_criar_pasta_mensagens();
 
@@ -35,6 +37,8 @@ int main() {
 
     do {
         opcao = mostrar_menu_principal();
+        // Limpa a tela antes de mostrar o menu novamente
+        system("cls");
         switch (opcao) {
             case 1:
                 menu_login(ht, g, eqs);
