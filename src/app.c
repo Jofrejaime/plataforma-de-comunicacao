@@ -44,12 +44,11 @@ void listar_mensagens_comuns(const char* usuario, const char* outro, bool destin
     }
     printf("\nHistórico com %s:\n", outro);
     char linha[512];
-    char ultima_data[6] = "";
     int encontrou = 0;
     while (fgets(linha, sizeof(linha), f)) {
-        char data[11], hora[6], ori[100], des[100], msg[256];
-        int lidos = sscanf(linha, "%10s %5s - ori: %99[^ ] des: %99[^ ] - %[^]", data, hora, ori, des, msg);
-        if (lidos == 5) {
+        char datahora[32], ori[100], des[100], msg[256];
+        int lidos = sscanf(linha, "%31[^;];%99[^;];%99[^;];%255[^\n]", datahora, ori, des, msg);
+        if (lidos == 4) {
             int deve_mostrar = 0;
             if (destino_e_equipa) {
                 deve_mostrar = 1;
@@ -60,20 +59,7 @@ void listar_mensagens_comuns(const char* usuario, const char* outro, bool destin
             }
             if (deve_mostrar) {
                 encontrou = 1;
-                char data_md[6];
-                strncpy(data_md, data + 5, 5);
-                data_md[5] = '\0';
-                if (strcmp(data_md, ultima_data) != 0) {
-                    printf("\n\t %s\n", data_md);
-                    strcpy(ultima_data, data_md);
-                }
-                if (destino_e_equipa) {
-                    printf("\t   %s: %s\n", ori, msg);
-                } else if (strcmp(ori, usuario) == 0) {
-                    printf("\t   %s\n", msg);
-                } else {
-                    printf("\t   %s: %s\n", ori, msg);
-                }
+                printf("%s | %s -> %s: %s\n", datahora, ori, des, msg);
             }
         }
     }
@@ -184,14 +170,12 @@ int ft_strlen(char *pt[]) {
     return (i);
 }
 
-
-// Verifica se a pasta existe, e a cria se não existir
 void verificar_ou_criar_pasta(const char* nome_pasta) {
     char path[256];
     snprintf(path, sizeof(path), "%s/.verifica", nome_pasta);
     FILE* teste = fopen(path, "r");
     if (teste) {
-        fclose(teste); // pasta já existe
+        fclose(teste);
     } else {
         MKDIR(nome_pasta);
     }

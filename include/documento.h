@@ -1,6 +1,7 @@
 #ifndef DOCUMENTO_H
 #define DOCUMENTO_H
 
+#include "membro.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include <time.h>

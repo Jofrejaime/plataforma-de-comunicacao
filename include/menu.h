@@ -6,6 +6,7 @@
 #include "membro.h"
 #include "hash.h"
 #include "app.h"
+#include "documento.h"
 #include <conio.h>
 #include <windows.h>
 
