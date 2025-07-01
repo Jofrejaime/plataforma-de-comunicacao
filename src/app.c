@@ -253,10 +253,49 @@ int	ft_strlen(char *pt[]){
 		i++;
 	return (i);
 }
+void enviar_documento(const char* remetente, const char* destino, bool destino_e_equipa) {
+    // Criar pasta do remetente
+    char pasta[100];
+    snprintf(pasta, sizeof(pasta), "documentos/%s", remetente);
+    MKDIR(pasta);
+    // Pegar data atual
+    time_t agora = time(NULL);
+    struct tm* tempo = localtime(&agora);
+    char data[11];
+    strftime(data, sizeof(data), "%Y-%m-%d", tempo);
+
+    // Nome do ficheiro
+    char nome_ficheiro[200];
+    snprintf(nome_ficheiro, sizeof(nome_ficheiro), "%s/para_%s_%s.txt", pasta, destino, data);
+
+    FILE* f = fopen(nome_ficheiro, "w");
+    if (!f) {
+        printf("Erro ao criar ficheiro do documento.\n");
+        return;
+    }
+
+    // Cabeçalho
+    fprintf(f, "remetente: %s\n", remetente);
+    fprintf(f, "destino: %s\n", destino);
+    fprintf(f, "data: %s\n", data);
+    fprintf(f, "----------------------\n");
+
+    // Conteúdo
+    printf("Digite o conteúdo do documento:\n> ");
+    char conteudo[512];
+    fgets(conteudo, sizeof(conteudo), stdin);
+    conteudo[strcspn(conteudo, "\n")] = 0;
+    fprintf(f, "%s\n", conteudo);
+
+    fclose(f);
+    printf("📎 Documento enviado com sucesso para %s.\n", destino);
+}
+
 void verificar_ou_criar_pasta_data() {
-#ifdef _WIN32
-    _mkdir("data");
-#else
-    mkdir("data", 0777);
-#endif
+    FILE* teste = fopen("data/.verifica", "r");
+    if (teste) {
+        fclose(teste); // pasta já existe
+    } else {
+        MKDIR("data");
+    }
 }

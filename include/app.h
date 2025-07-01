@@ -24,5 +24,5 @@ void 	salvar_membro_em_ficheiro(Membro* m);
 void	actualizar_permissao(HashTable *ht, const char *email);
 void	listar_permisao(Membro *m, char **permissao);
 int	ft_strlen(char **pt);
-
+void enviar_documento(const char* remetente, const char* destino, bool destino_e_equipa);
 #endif

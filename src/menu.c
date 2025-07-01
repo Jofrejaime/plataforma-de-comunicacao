@@ -7,6 +7,7 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
 		"1. Enviar mensagem",
 		"2. Ver equipas",
 		"0. Sair",
+        "3. Enviar documento",
 		NULL
 	};
     Membro* m = buscar_membro(ht, usuario);
@@ -44,7 +45,21 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
             }
         } else if (opcao == 2) {
             menu_equipas_membro(usuario, m->tipo, eqs);
-        } else if (opcao != 0) {
+        } else if (opcao == 3) {
+            printf("Destino (email ou equipa): ");
+            fgets(destino, sizeof(destino), stdin);
+            destino[strcspn(destino, "\n")] = 0;
+
+            if (buscar_equipa(eqs, destino) || buscar_membro(ht, destino)) {
+                enviar_documento(usuario, destino, buscar_equipa(eqs, destino) != NULL);
+            } else {
+                printf("Erro: destinatario não encontrado.\n");
+                Sleep(3000);
+            }
+        } else if (opcao == 0) {
+            printf("Voltando ao menu principal...\n");
+        }
+        else if (opcao != 0) {
             printf("Opção inválida.\n");
             Sleep(3000);
         }
