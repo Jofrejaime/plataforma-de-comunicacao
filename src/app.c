@@ -42,12 +42,15 @@ void listar_mensagens_comuns(const char* usuario, const char* outro, bool destin
         printf("    (sem mensagens anteriores com %s)\n", outro);
         return;
     }
-    printf("\nHistórico com %s:\n", outro);
+    // Agrupamento por data
     char linha[512];
+    char last_date[11] = ""; // yyyy-mm-dd\0
+    char last_year[5] = "";
     int encontrou = 0;
     while (fgets(linha, sizeof(linha), f)) {
         char datahora[32], ori[100], des[100], msg[256];
         int lidos = sscanf(linha, "%31[^;];%99[^;];%99[^;];%255[^\n]", datahora, ori, des, msg);
+         printf("");
         if (lidos == 4) {
             int deve_mostrar = 0;
             if (destino_e_equipa) {
@@ -59,7 +62,32 @@ void listar_mensagens_comuns(const char* usuario, const char* outro, bool destin
             }
             if (deve_mostrar) {
                 encontrou = 1;
-                printf("%s | %s -> %s: %s\n", datahora, ori, des, msg);
+                // Extrai ano, mês, dia
+                char ano[5], mes[3], dia[3];
+                strncpy(ano, datahora, 4); ano[4] = '\0';
+                strncpy(mes, datahora+5, 2); mes[2] = '\0';
+                strncpy(dia, datahora+8, 2); dia[2] = '\0';
+                char data_atual[11];
+                snprintf(data_atual, sizeof(data_atual), "%s-%s-%s", ano, mes, dia);
+                // Mostra ano se mudou
+                if (strcmp(last_year, ano) != 0) {
+                    printf("%s-", ano);
+                    strcpy(last_year, ano);
+                    last_date[0] = '\0'; // força mostrar data
+                }
+                // Mostra data (mm-dd) se mudou
+                if (strcmp(last_date, data_atual) != 0) {
+                    printf("%s-%s\n", mes, dia);
+                    strcpy(last_date, data_atual);
+                }
+                // Mostra nome do oposto apenas se for mensagem dele
+                if (strcmp(ori, usuario) == 0) {
+                    // Mensagem minha
+                    printf("    %s\n", msg);
+                } else {
+                    // Mensagem do outro
+                    printf("%s: %s\n", ori, msg);
+                }
             }
         }
     }
