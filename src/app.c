@@ -124,7 +124,8 @@ void salvar_membro_em_ficheiro(Membro* m) {
     if (!m) return;
     FILE* f = fopen("data/membros.txt", "a");
     if (f) {
-        fprintf(f, "%s %s %d %d\n", m->email, m->senha, m->tipo, m->ativo);
+        // Novo formato: email;senha;tipo;ativo\n
+        fprintf(f, "%s;%s;%d;%d\n", m->email, m->senha, m->tipo, m->ativo);
         fclose(f);
     }
 }
@@ -136,11 +137,12 @@ void carregar_membros(HashTable* ht) {
     if (!f) return;
     char email[100], senha[50];
     int tipo, ativo;
-    while (fscanf(f, "%s %s %d %d", email, senha, &tipo, &ativo) == 4) {
+    while (fscanf(f, "%99[^;];%49[^;];%d;%d\n", email, senha, &tipo, &ativo) == 4) {
         Membro* m = criar_membro(email, senha, tipo, 0);
         if (!m) continue;
         m->ativo = ativo;
         inserir_membro(ht, m);
+        carregar_documentos_membro(m);
     }
     fclose(f);
 }

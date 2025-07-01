@@ -1,0 +1,46 @@
+# Padrão de Armazenamento de Dados - Plataforma de Comunicação
+
+## 1. Membros (`data/membros.txt`)
+- **Formato:**
+  - `email;senha;tipo;ativo`
+- **Exemplo:**
+  - `lucio@email.com;123;1;1`
+  - `jofre@email.com;abc;0;1`
+
+## 2. Equipas (`data/equipas.txt`)
+- **Formato:**
+  - `nome_equipa;tipo;membro1,membro2,membro3`
+- **Exemplo:**
+  - `devs;1;lucio@email.com,jofre@email.com`
+  - `marketing;0;ana@email.com`
+
+## 3. Mensagens (`mensagens/<destino>.txt`)
+- **Formato:**
+  - `data_hora;origem;destino;conteudo`
+- **Exemplo:**
+  - `2025-07-01 10:30;lucio@email.com;jofre@email.com;Olá, tudo bem?`
+  - `2025-07-01 10:32;jofre@email.com;devs;Documento enviado!`
+
+## 4. Documentos Lógicos (`documentos/<email>_docs.txt`)
+- **Formato:**
+  - `tipo;participante;data;nome_arquivo`
+- **Exemplo:**
+  - `ENVIADO;jofre@email.com;2025-07-01;para_jofre_2025-07-01.txt`
+  - `RECEBIDO;lucio@email.com;2025-07-01;para_lucio_2025-07-01.txt`
+
+## 5. Documentos Físicos (`documentos/<remetente>/para_<destino>_<data>.txt`)
+- **Formato:**
+  - `remetente;destino;data;conteudo`
+- **Exemplo:**
+  - `lucio@email.com;jofre@email.com;2025-07-01;Relatório do projeto`
+
+## Observações Gerais
+- Todos os arquivos usam **ponto e vírgula (;)** como delimitador de campos.
+- Arquivos de equipas usam **vírgula (,)** para separar múltiplos membros na mesma linha.
+- O padrão facilita importação/exportação, leitura por scripts e manutenção.
+- A extensão dos arquivos permanece `.txt`.
+- O conteúdo segue o padrão CSV (valores separados por delimitador), mas não é necessário usar a extensão `.csv`.
+
+---
+
+**Este documento descreve o padrão de armazenamento de dados implementado na plataforma de comunicação, garantindo organização, clareza e facilidade de integração.**

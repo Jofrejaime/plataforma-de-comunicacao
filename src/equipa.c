@@ -99,18 +99,16 @@ void carregar_equipas(ListaEquipas* lista) {
     if (!f) return;
     char linha[512];
     while (fgets(linha, sizeof(linha), f)) {
-        char nome[100];
+        char nome[100], membros[400];
         int tipo;
-        char* token = strtok(linha, " ");
-        if (!token) continue;
-        strcpy(nome, token);
-        token = strtok(NULL, " ");
-        if (!token) continue;
-        tipo = atoi(token);
-        if (tipo < 0 || tipo > 1) continue;
-        Equipa* e = criar_equipa(lista, nome, tipo, 0);
-        while ((token = strtok(NULL, " \n")) != NULL) {
-            adicionar_membro_equipa(e, token);
+        // Novo formato: nome_equipa;tipo;membro1,membro2,...\n
+        if (sscanf(linha, "%99[^;];%d;%399[^\n]", nome, &tipo, membros) >= 2) {
+            Equipa* e = criar_equipa(lista, nome, tipo, 0);
+            char* token = strtok(membros, ",");
+            while (token) {
+                adicionar_membro_equipa(e, token);
+                token = strtok(NULL, ",");
+            }
         }
     }
     fclose(f);
@@ -123,10 +121,14 @@ void salvar_todas_equipas(ListaEquipas* lista) {
     if (!f) return;
     Equipa* e = lista->lista;
     while (e) {
-        fprintf(f, "%s %d", e->nome, e->tipo);
+        // Novo formato: nome_equipa;tipo;membro1,membro2,...\n
+        fprintf(f, "%s;%d;", e->nome, e->tipo);
         MembroEquipa* m = e->membros;
+        int first = 1;
         while (m) {
-            fprintf(f, " %s", m->email);
+            if (!first) fprintf(f, ",");
+            fprintf(f, "%s", m->email);
+            first = 0;
             m = m->prox;
         }
         fprintf(f, "\n");

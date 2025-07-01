@@ -92,9 +92,9 @@ int registrar_comunicacao(Grafo* g, const char* origem, const char* destino, con
     char linha[512];
     time_t agora = time(NULL);
     struct tm* tempo = localtime(&agora);
-    char datahora[64];
+    char datahora[32];
     strftime(datahora, sizeof(datahora), "%Y-%m-%d %H:%M", tempo);
-    snprintf(linha, sizeof(linha), "%s - ori: %s des: %s - %s\n", datahora, origem, destino, conteudo);
+    snprintf(linha, sizeof(linha), "%s;%s;%s;%s\n", datahora, origem, destino, conteudo);
     // Grava em ficheiros
     if (strchr(destino, '@') == NULL) {
         char path[150];
@@ -130,9 +130,9 @@ void carregar_mensagens_para_grafo(Grafo* g, const char* pasta_mensagens) {
             FILE* f = fopen(path, "r");
             if (!f) continue;
             while (fgets(linha, sizeof(linha), f)) {
-                char data[11], hora[6], ori[100], des[100], msg[256];
-                int lidos = sscanf(linha, "%10s %5s - ori: %99[^ ] des: %99[^ ] - %[^", data, hora, ori, des, msg);
-                if (lidos == 5) {
+                char datahora[32], ori[100], des[100], msg[256];
+                int lidos = sscanf(linha, "%31[^;];%99[^;];%99[^;];%255[^\n]", datahora, ori, des, msg);
+                if (lidos == 4) {
                     adicionar_aresta(g, ori, des, msg);
                 }
             }

@@ -22,4 +22,10 @@ void enviar_documento(const char* remetente, const char* destino, bool destino_e
 // Função utilitária para criar/verificar pasta
 void verificar_ou_criar_pasta(const char* nome_pasta);
 
+// Carrega a lista de documentos do membro a partir do arquivo de log
+void carregar_documentos_membro(Membro* membro);
+
+// Lê o conteúdo de um arquivo físico de documento no novo padrão CSV
+void ler_documento_fisico(const char* caminho);
+
 #endif
