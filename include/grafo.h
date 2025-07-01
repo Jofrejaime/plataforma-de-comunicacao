@@ -30,13 +30,13 @@ typedef struct {
 
 // Verifica ou cria a pasta de mensagens
 void verificar_ou_criar_pasta_mensagens();
-// Cria um novo grafo
+// Cria um novo grafo. Retorna NULL em caso de erro de alocação.
 Grafo* criar_grafo();
-// Busca um vértice pelo id
+// Busca um vértice pelo id. Retorna NULL se não encontrado ou erro.
 Vertice* buscar_vertice(Grafo* g, const char* id);
-// Adiciona um vértice ao grafo
+// Adiciona um vértice ao grafo. Retorna NULL em caso de erro.
 Vertice* adicionar_vertice(Grafo* g, const char* id);
-// Adiciona uma aresta entre dois vértices
+// Adiciona uma aresta entre dois vértices. Retorna 1 em caso de sucesso, 0 em caso de erro.
 int adicionar_aresta(Grafo* g, const char* origem, const char* destino, const char* conteudo);
 // Imprime o grafo
 void imprimir_grafo(Grafo* g);
@@ -44,5 +44,11 @@ void imprimir_grafo(Grafo* g);
 int registrar_comunicacao(Grafo* g, const char* origem, const char* destino, const char* conteudo);
 // Carrega mensagens dos arquivos para o grafo
 void carregar_mensagens_para_grafo(Grafo* g, const char* pasta_mensagens);
+// Libera memória de uma aresta
+void liberar_aresta(Aresta* a);
+// Libera memória de um vértice
+void liberar_vertice(Vertice* v);
+// Libera todo o grafo
+void desalocar_grafo(Grafo* g);
 
 #endif

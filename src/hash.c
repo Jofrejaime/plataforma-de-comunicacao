@@ -1,5 +1,6 @@
 #include "hash.h"
 
+// Calcula o índice de hash para um email. Retorna 0 se email for NULL.
 int hash(const char* email) {
     if (!email) return 0;
     int soma = 0;
@@ -8,6 +9,7 @@ int hash(const char* email) {
     return soma % TAM_HASH;
 }
 
+// Cria uma nova tabela hash. Retorna NULL em caso de erro de alocação.
 HashTable* criar_hash() {
     HashTable* ht = (HashTable*)malloc(sizeof(HashTable));
     if (!ht) return NULL;
@@ -16,6 +18,7 @@ HashTable* criar_hash() {
     return ht;
 }
 
+// Insere um membro na tabela hash. Retorna 1 em caso de sucesso, 0 em caso de erro.
 int inserir_membro(HashTable* ht, Membro* novo) {
     if (!ht || !novo) return 0;
     int indice = hash(novo->email);
@@ -24,8 +27,9 @@ int inserir_membro(HashTable* ht, Membro* novo) {
     return 1;
 }
 
+// Busca um membro pelo email. Retorna ponteiro para o membro ou NULL se não encontrado.
 Membro* buscar_membro(HashTable* ht, const char* email) {
-    if (!ht) return NULL;
+    if (!ht || !email) return NULL;
     int indice = hash(email);
     Membro* atual = ht->tabela[indice];
     while (atual) {
@@ -36,8 +40,9 @@ Membro* buscar_membro(HashTable* ht, const char* email) {
     return NULL;
 }
 
+// Remove um membro da tabela hash. Retorna 1 em caso de sucesso, 0 se não encontrado ou erro.
 int remover_membro(HashTable* ht, const char* email) {
-    if (!ht) return 0;
+    if (!ht || !email) return 0;
     int indice = hash(email);
     Membro* atual = ht->tabela[indice];
     Membro* anterior = NULL;
@@ -47,11 +52,25 @@ int remover_membro(HashTable* ht, const char* email) {
                 anterior->prox = atual->prox;
             else
                 ht->tabela[indice] = atual->prox;
-            free(atual);
+            liberar_membro(atual);
             return 1;
         }
         anterior = atual;
         atual = atual->prox;
     }
     return 0;
+}
+
+// Libera toda a tabela hash e seus membros.
+void desalocar_hash(HashTable* ht) {
+    if (!ht) return;
+    for (int i = 0; i < TAM_HASH; i++) {
+        Membro* atual = ht->tabela[i];
+        while (atual) {
+            Membro* prox = atual->prox;
+            liberar_membro(atual);
+            atual = prox;
+        }
+    }
+    free(ht);
 }

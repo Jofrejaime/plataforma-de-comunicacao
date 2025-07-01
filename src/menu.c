@@ -3,43 +3,45 @@
 void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* eqs) {
     int opcao;
     char destino[100], conteudo[256];
-	char *opcs[] = {
-		"1. Enviar mensagem",
-		"2. Ver equipas",
-		"0. Sair",
+    char *opcs[] = {
+        "1. Enviar mensagem",
+        "2. Ver equipas",
+        "0. Sair",
         "3. Enviar documento",
-		NULL
-	};
+        NULL
+    };
     Membro* m = buscar_membro(ht, usuario);
-
     do {
         printf("\n--- Plataforma (%s) ---\n", usuario);
         opcao = menu_iterativo(opcs);
-
         if (opcao == 1) {
             printf("Destino (email ou equipa): ");
             fgets(destino, sizeof(destino), stdin);
             destino[strcspn(destino, "\n")] = 0;
-
             if (buscar_equipa(eqs, destino)) {
-                listar_mensagens_comuns(usuario, destino, true); // histórico da equipa
-
+                listar_mensagens_comuns(usuario, destino, true);
                 printf("\nNova mensagem para equipa: ");
                 fgets(conteudo, sizeof(conteudo), stdin);
                 conteudo[strcspn(conteudo, "\n")] = 0;
-
-                enviar_mensagem_para_equipa(ht, g, eqs, usuario, destino, conteudo);
-            } else if(buscar_membro(ht, destino)){
-                listar_mensagens_comuns(usuario, destino, false); // histórico com pessoa
-
+                int ok = enviar_mensagem_para_equipa(ht, g, eqs, usuario, destino, conteudo);
+                if (ok)
+                    printf("Mensagem enviada para a equipa com sucesso!\n");
+                else
+                    printf("Erro ao enviar mensagem para a equipa. Verifique permissões ou existência.\n");
+                Sleep(3000);
+            } else if (buscar_membro(ht, destino)) {
+                listar_mensagens_comuns(usuario, destino, false);
                 printf("\nNova mensagem: ");
                 fgets(conteudo, sizeof(conteudo), stdin);
                 conteudo[strcspn(conteudo, "\n")] = 0;
-
-                enviar_mensagem(ht, g, usuario, destino, conteudo);
-            }
-            else{
-                printf("Erro: destinatario não encontrado.\n");
+                int ok = enviar_mensagem(ht, g, usuario, destino, conteudo);
+                if (ok)
+                    printf("Mensagem enviada com sucesso!\n");
+                else
+                    printf("Erro ao enviar mensagem. Verifique se o destinatário existe e está ativo.\n");
+                Sleep(3000);
+            } else {
+                printf("Erro: destinatário não encontrado.\n");
                 Sleep(3000);
                 continue;
             }
@@ -49,26 +51,22 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
             printf("Destino (email ou equipa): ");
             fgets(destino, sizeof(destino), stdin);
             destino[strcspn(destino, "\n")] = 0;
-
             bool is_equipa = buscar_equipa(eqs, destino) != NULL;
             if (is_equipa || buscar_membro(ht, destino)) {
                 enviar_documento(usuario, destino, is_equipa);
-            }
-            else {
-                printf("Erro: destinatario não encontrado.\n");
+                printf("Documento enviado!\n");
+            } else {
+                printf("Erro: destinatário não encontrado.\n");
                 Sleep(3000);
                 getch();
             }
         } else if (opcao == 0) {
             printf("Voltando ao menu principal...\n");
-        }
-        else if (opcao != 0) {
+        } else if (opcao != 0) {
             printf("Opção inválida.\n");
             Sleep(3000);
         }
-
     } while (opcao != 0);
-
     printf("Saindo da plataforma...\n");
 }
 
@@ -86,17 +84,12 @@ void menu_login(HashTable* ht, Grafo* g, ListaEquipas* eqs) {
     scanf("%s", senha);
     getchar(); // limpa ENTER do buffer
 
-    Membro* m = buscar_membro(ht, email);
-    if (m && strcmp(m->senha, senha) == 0 && m->ativo) {
+    int ok = login(ht, g, eqs, email, senha);
+    if (ok) {
         printf("Login bem-sucedido!\n");
         Sleep(3000);
-        if (m->tipo == ADMIN) {
-            menu_admin(ht, eqs);
-        } else {
-            menu_mensagens(ht, g, email, eqs);
-        }
     } else {
-        printf("Login falhou.\n");
+        printf("Login falhou. Verifique email, senha ou estado da conta.\n");
         Sleep(3000);
     }
 }
@@ -113,7 +106,12 @@ void menu_registro(HashTable* ht) {
     printf("Tipo (0=ADMIN, 1=CORPORATIVO, 2=CONVIDADO): ");
     scanf("%d", &tipo);
 
-    registrar(ht, email, senha, (TipoMembro)tipo);
+    int ok = registrar(ht, email, senha, (TipoMembro)tipo);
+    if (ok)
+        printf("Membro cadastrado com sucesso!\n");
+    else
+        printf("Erro ao cadastrar membro. Verifique se o email já existe ou se os dados são válidos.\n");
+    Sleep(3000);
 }
 
 void menu_admin(HashTable* ht, ListaEquipas* eqs) {
@@ -156,58 +154,44 @@ void menu_admin(HashTable* ht, ListaEquipas* eqs) {
                 printf("Nome da equipa: ");
                 fgets(nome_equipa, sizeof(nome_equipa), stdin);
                 nome_equipa[strcspn(nome_equipa, "\n")] = 0;
-
                 printf("Email do membro: ");
                 fgets(email, sizeof(email), stdin);
                 email[strcspn(email, "\n")] = 0;
-
-                {
-                    Equipa* e = buscar_equipa(eqs, nome_equipa);
-                    Membro* m = buscar_membro(ht, email);
-
-                    if (e && m && m->ativo) {
-                        if (adicionar_membro_equipa(e, email))
-                        {
-                            printf("Membro adicionado com sucesso!\n");
-                             salvar_todas_equipas(eqs);
-                             Sleep(3000);
-                        }
-                        else
-                            printf("Membro já está na equipa.\n");
-                            Sleep(3000);
+                Equipa* e = buscar_equipa(eqs, nome_equipa);
+                Membro* m = buscar_membro(ht, email);
+                if (e && m && m->ativo) {
+                    int ok = adicionar_membro_equipa(e, email);
+                    if (ok) {
+                        printf("Membro adicionado com sucesso!\n");
+                        salvar_todas_equipas(eqs);
                     } else {
-                        printf("Equipa ou membro inválido.\n");
-                        Sleep(3000);
+                        printf("Membro já está na equipa ou erro ao adicionar.\n");
                     }
+                } else {
+                    printf("Equipa ou membro inválido.\n");
                 }
+                Sleep(3000);
                 break;
-
             case 3:
                 printf("Nome da equipa: ");
                 fgets(nome_equipa, sizeof(nome_equipa), stdin);
                 nome_equipa[strcspn(nome_equipa, "\n")] = 0;
-
                 printf("Email do membro: ");
                 fgets(email, sizeof(email), stdin);
                 email[strcspn(email, "\n")] = 0;
-
-                {
-                    Equipa* e = buscar_equipa(eqs, nome_equipa);
-                    if (e) {
-                        if (remover_membro_equipa(e, email))
-                        {   
-						    salvar_todas_equipas(eqs);
-                            printf("Membro removido com sucesso!\n");
-                            Sleep(3000);
-                        }
-                        else
-                            printf("Membro não encontrado na equipa.\n");
-                            Sleep(3000);
+                e = buscar_equipa(eqs, nome_equipa);
+                if (e) {
+                    int ok = remover_membro_equipa(e, email);
+                    if (ok) {
+                        salvar_todas_equipas(eqs);
+                        printf("Membro removido com sucesso!\n");
                     } else {
-                        printf("Equipa não encontrada.\n");
-                        Sleep(3000);
+                        printf("Membro não encontrado na equipa ou erro ao remover.\n");
                     }
+                } else {
+                    printf("Equipa não encontrada.\n");
                 }
+                Sleep(3000);
                 break;
 
             case 4:

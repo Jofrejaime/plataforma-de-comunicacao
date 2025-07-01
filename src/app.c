@@ -1,163 +1,105 @@
 #include "app.h"
 
+// --- Funções de registro e login ---
+// Registra um novo membro. Retorna 1 em caso de sucesso, 0 em caso de erro.
 bool registrar(HashTable* ht, const char* email, const char* senha, TipoMembro tipo) {
-	
-	if(!strchr(email, '@')){
-		printf("Email inválido!\n");
-		Sleep(3000);
-		return false;
-	}
-    if (buscar_membro(ht, email)) {
-        printf("Email já cadastrado!\n");
-        Sleep(3000);
-        return false;
-    }
-
+    if (!ht || !email || !senha || !strchr(email, '@')) return 0;
+    if (buscar_membro(ht, email)) return 0;
     Membro* novo = criar_membro(email, senha, tipo, 1);
-    if (!novo || !inserir_membro(ht, novo)) {
-        printf("Erro ao cadastrar!\n");
-        Sleep(3000);
-        return false;
-    }
-
-    printf("Membro cadastrado com sucesso!\n");
+    if (!novo || !inserir_membro(ht, novo)) return 0;
     salvar_membro_em_ficheiro(novo);
-    Sleep(3000);
-    return true;
+    return 1;
 }
 
-void listar_mensagens_comuns(const char* usuario, const char* outro, bool destino_e_equipa) {
-    char path[150];
-    FILE* f;
-
-    // Decide qual ficheiro abrir
-    if (destino_e_equipa) {
-        snprintf(path, sizeof(path), "mensagens/%s.txt", outro); // equipa
-    } else {
-        snprintf(path, sizeof(path), "mensagens/%s.txt", usuario); // pessoal
-    }
-
-    f = fopen(path, "r");
-    if (!f) {
-        printf("    (sem mensagens anteriores com %s)\n", outro);
-        return;
-    }
-
-    printf("\nHistórico com %s:\n", outro);
-
-    char linha[512];
-    char ultima_data[6] = "";
-    int encontrou = 0;
-
-    while (fgets(linha, sizeof(linha), f)) {
-        char data[11], hora[6], ori[100], des[100], msg[256];
-
-        int lidos = sscanf(linha, "%10s %5s - ori: %99[^ ] des: %99[^ ] - %[^\n]",
-                           data, hora, ori, des, msg);
-
-        if (lidos == 5) {
-            int deve_mostrar = 0;
-
-            if (destino_e_equipa) {
-                deve_mostrar = 1;
-            } else {
-                // mostra só se for uma troca entre usuario e outro
-                if ((strcmp(ori, outro) == 0 && strcmp(des, usuario) == 0) ||
-                    (strcmp(des, outro) == 0 && strcmp(ori, usuario) == 0)) {
-                    deve_mostrar = 1;
-                }
-            }
-
-            if (deve_mostrar) {
-                encontrou = 1;
-
-                // Pega MM/DD
-                char data_md[6];
-                strncpy(data_md, data + 5, 5);
-                data_md[5] = '\0';
-
-                // Cabeçalho de data (📅)
-                if (strcmp(data_md, ultima_data) != 0) {
-                    printf("\n\t %s\n", data_md);
-                    strcpy(ultima_data, data_md);
-                }
-
-                // Exibição da mensagem
-                if (destino_e_equipa) {
-                    printf("\t   %s: %s\n", ori, msg);
-                } else if (strcmp(ori, usuario) == 0) {
-                    printf("\t   %s\n", msg); // enviada por mim
-                } else {
-                    printf("\t   %s: %s\n", ori, msg); // recebida
-                }
-            }
-        }
-    }
-
-    if (!encontrou) {
-        printf("    (sem mensagens trocadas)\n");
-    }
-
-    fclose(f);
-}
-
-bool enviar_mensagem(HashTable* ht, Grafo* g, const char* origem, const char* destino, const char* conteudo) {
-    Membro* remetente = buscar_membro(ht, origem);
-    if (!remetente || !remetente->ativo) {
-        printf("Erro: remetente inválido ou desativado.\n");
-    	Sleep(3000);
-        return false;
-    }
-
-    Membro* receptor = buscar_membro(ht, destino);
-    if (!receptor && !buscar_vertice(g, destino)) {
-        printf("Erro: destino inexistente.\n");
-        Sleep(3000);
-        return false;
-    }
-
-    if (registrar_comunicacao(g, origem, destino, conteudo)) {
-        printf("Mensagem enviada e registrada com sucesso.\n");
-        Sleep(3000);
-        return true;
-    }
-
-    printf("Erro ao registrar mensagem.\n");
-	Sleep(3000);
-    return false;
-}
-
+// Realiza login de um membro. Retorna 1 em caso de sucesso, 0 em caso de erro.
 bool login(HashTable* ht, Grafo* g, ListaEquipas* eqs, char* email, char* senha) {
+    if (!ht || !email || !senha) return 0;
     Membro* m = buscar_membro(ht, email);
     if (m && strcmp(m->senha, senha) == 0 && m->ativo) {
-        printf("Login bem-sucedido!\n");
-
         if (m->tipo == ADMIN) {
             menu_admin(ht, eqs);
         } else {
             menu_mensagens(ht, g, email, eqs);
         }
-
-        return true;
+        return 1;
     }
-
-    printf("Login falhou. Verifique email, senha ou estado da conta.\n");
-        	Sleep(3000);
-    return false;
+    return 0;
 }
 
-bool enviar_mensagem_para_equipa(HashTable* ht, Grafo* g, ListaEquipas* eqs, const char* origem, const char* nome_equipa, const char* conteudo) {
-    Equipa* e = buscar_equipa(eqs, nome_equipa);
-    if (!e) {
-        printf("Erro: equipa não existe.\n");
-            	Sleep(3000);
-        return false;
+// --- Funções de mensagens ---
+// Lista mensagens comuns entre dois usuários (apenas exibe)
+void listar_mensagens_comuns(const char* usuario, const char* outro, bool destino_e_equipa) {
+    char path[150];
+    FILE* f;
+    if (destino_e_equipa) {
+        snprintf(path, sizeof(path), "mensagens/%s.txt", outro);
+    } else {
+        snprintf(path, sizeof(path), "mensagens/%s.txt", usuario);
     }
+    f = fopen(path, "r");
+    if (!f) {
+        printf("    (sem mensagens anteriores com %s)\n", outro);
+        return;
+    }
+    printf("\nHistórico com %s:\n", outro);
+    char linha[512];
+    char ultima_data[6] = "";
+    int encontrou = 0;
+    while (fgets(linha, sizeof(linha), f)) {
+        char data[11], hora[6], ori[100], des[100], msg[256];
+        int lidos = sscanf(linha, "%10s %5s - ori: %99[^ ] des: %99[^ ] - %[^]", data, hora, ori, des, msg);
+        if (lidos == 5) {
+            int deve_mostrar = 0;
+            if (destino_e_equipa) {
+                deve_mostrar = 1;
+            } else {
+                if ((strcmp(ori, outro) == 0 && strcmp(des, usuario) == 0) || (strcmp(des, outro) == 0 && strcmp(ori, usuario) == 0)) {
+                    deve_mostrar = 1;
+                }
+            }
+            if (deve_mostrar) {
+                encontrou = 1;
+                char data_md[6];
+                strncpy(data_md, data + 5, 5);
+                data_md[5] = '\0';
+                if (strcmp(data_md, ultima_data) != 0) {
+                    printf("\n\t %s\n", data_md);
+                    strcpy(ultima_data, data_md);
+                }
+                if (destino_e_equipa) {
+                    printf("\t   %s: %s\n", ori, msg);
+                } else if (strcmp(ori, usuario) == 0) {
+                    printf("\t   %s\n", msg);
+                } else {
+                    printf("\t   %s: %s\n", ori, msg);
+                }
+            }
+        }
+    }
+    if (!encontrou) {
+        printf("    (sem mensagens trocadas)\n");
+    }
+    fclose(f);
+}
 
-    // Verifica se o remetente tem permissão
+// Envia mensagem entre membros. Retorna 1 em caso de sucesso, 0 em caso de erro.
+bool enviar_mensagem(HashTable* ht, Grafo* g, const char* origem, const char* destino, const char* conteudo) {
+    if (!ht || !g || !origem || !destino || !conteudo) return 0;
+    Membro* remetente = buscar_membro(ht, origem);
+    if (!remetente || !remetente->ativo) return 0;
+    Membro* receptor = buscar_membro(ht, destino);
+    if (!receptor && !buscar_vertice(g, destino)) return 0;
+    if (!registrar_comunicacao(g, origem, destino, conteudo)) return 0;
+    return 1;
+}
+
+// Envia mensagem para uma equipa. Retorna 1 em caso de sucesso, 0 em caso de erro.
+bool enviar_mensagem_para_equipa(HashTable* ht, Grafo* g, ListaEquipas* eqs, const char* origem, const char* nome_equipa, const char* conteudo) {
+    if (!ht || !g || !eqs || !origem || !nome_equipa || !conteudo) return 0;
+    Equipa* e = buscar_equipa(eqs, nome_equipa);
+    if (!e) return 0;
     Membro* m = buscar_membro(ht, origem);
     int permitido = 0;
-
     if (e->tipo == PUBLICA && m->tipo == CORPORATIVO) {
         permitido = 1;
     } else {
@@ -170,26 +112,15 @@ bool enviar_mensagem_para_equipa(HashTable* ht, Grafo* g, ListaEquipas* eqs, con
             me = me->prox;
         }
     }
-
-    if (!permitido) {
-        printf("Acesso negado: você não pertence à equipa.\n");
-            	Sleep(3000);
-        return false;
-    }
-
-    // ✅ Esta função já grava no ficheiro e adiciona a ligação no grafo
-    if (registrar_comunicacao(g, origem, nome_equipa, conteudo)) {
-        printf("Mensagem enviada para a equipa %s.\n", nome_equipa);
-            	Sleep(3000);
-        return true;
-    }
-
-    printf("Erro ao registrar a comunicação.\n");
-        	Sleep(3000);
-    return false;
+    if (!permitido) return 0;
+    if (!registrar_comunicacao(g, origem, nome_equipa, conteudo)) return 0;
+    return 1;
 }
 
+// --- Funções de membros ---
+// Salva membro em ficheiro
 void salvar_membro_em_ficheiro(Membro* m) {
+    if (!m) return;
     FILE* f = fopen("data/membros.txt", "a");
     if (f) {
         fprintf(f, "%s %s %d %d\n", m->email, m->senha, m->tipo, m->ativo);
@@ -197,99 +128,86 @@ void salvar_membro_em_ficheiro(Membro* m) {
     }
 }
 
+// Carrega membros do ficheiro
 void carregar_membros(HashTable* ht) {
+    if (!ht) return;
     FILE* f = fopen("data/membros.txt", "r");
     if (!f) return;
-
     char email[100], senha[50];
     int tipo, ativo;
-
     while (fscanf(f, "%s %s %d %d", email, senha, &tipo, &ativo) == 4) {
         Membro* m = criar_membro(email, senha, tipo, 0);
+        if (!m) continue;
         m->ativo = ativo;
         inserir_membro(ht, m);
     }
-
     fclose(f);
 }
 
-void	listar_permisao(Membro *m, char **permissao){
-	printf("Permisoes do colaborador %s\n",m->email);
-	for(int i = 0; i < 3; i++)
-		if(m->permisao[i] == 1)
-		printf("%s : activo!\n", permissao[i]);
-		else
-		printf("%s : desativado\n", permissao[i]);
-	// printf("%s : %s\n", premissao[i], m-premissao[i]==1? "ativo":"desativado"); mais simples
+// Lista permissões de um membro (apenas exibe)
+void listar_permissao(Membro *m, char **permissao) {
+    if (!m || !permissao) return;
+    printf("Permissões do colaborador %s\n", m->email);
+    for (int i = 0; i < 3; i++) {
+        if (m->permissao[i] == 1)
+            printf("%s : ativo!\n", permissao[i]);
+        else
+            printf("%s : desativado\n", permissao[i]);
+    }
 }
 
-void	actualizar_permissao(HashTable *ht, const char *email)
-{
-	char	*permissoes[] = {"1. Adicionar", "2. Excluir", "3 .Convidar", "4. voltar", NULL};
-	int select = 0;
-	
-	Membro *m = buscar_membro(ht, email);
-	
-	if(!m){
-		printf("Este usuário não existe!\n");
-		return ;
-	}
-	
-	select = menu_iterativo(permissoes);
-	if(m->permisao[select] == 0){
-		m->permisao[select] = 1;
-		printf("Operação realizada com sucesso!\n o colaborador %s já pode %s", m->email, permissoes[select]);
-		    	Sleep(3000);
-	}else if(m->permisao[select] == 1){
-		m->permisao[select] = 0;
-		printf("Operação realizada com sucesso!\n o colaborador %s já não pode %s", m->email, permissoes[select]);
-		    	Sleep(3000);
-	}
+// Atualiza permissão de um membro
+void actualizar_permissao(HashTable *ht, const char *email) {
+    if (!ht || !email) return;
+    char *permissoes[] = {"1. Adicionar", "2. Excluir", "3. Convidar", "4. Voltar", NULL};
+    int select = 0;
+    Membro *m = buscar_membro(ht, email);
+    if (!m) return;
+    select = menu_iterativo(permissoes);
+    if (m->permissao[select] == 0) {
+        m->permissao[select] = 1;
+    } else if (m->permissao[select] == 1) {
+        m->permissao[select] = 0;
+    }
 }
 
-int	ft_strlen(char *pt[]){
-	int i = 0;
-	while(pt[i])
-		i++;
-	return (i);
+// --- Utilitários ---
+// Retorna o número de strings em um array de strings terminado por NULL
+int ft_strlen(char *pt[]) {
+    if (!pt) return 0;
+    int i = 0;
+    while (pt[i])
+        i++;
+    return (i);
 }
-    // Criar pasta do remetente
+
+// Envia documento para um membro ou equipa
+void enviar_documento(const char* remetente, const char* destino, bool destino_e_equipa) {
+    if (!remetente || !destino) return;
     char pasta[100];
     snprintf(pasta, sizeof(pasta), "documentos/%s", remetente);
     MKDIR(pasta);
-    // Pegar data atual
     time_t agora = time(NULL);
     struct tm* tempo = localtime(&agora);
     char data[11];
     strftime(data, sizeof(data), "%Y-%m-%d", tempo);
-
-    // Nome do ficheiro
     char nome_ficheiro[200];
     snprintf(nome_ficheiro, sizeof(nome_ficheiro), "%s/para_%s_%s.txt", pasta, destino, data);
-
     FILE* f = fopen(nome_ficheiro, "w");
-    if (!f) {
-        printf("Erro ao criar ficheiro do documento.\n");
-        return;
-    }
-
-    // Cabeçalho
+    if (!f) return;
     fprintf(f, "remetente: %s\n", remetente);
     fprintf(f, "destino: %s\n", destino);
     fprintf(f, "data: %s\n", data);
     fprintf(f, "----------------------\n");
-
-    // Conteúdo
     printf("Digite o conteúdo do documento:\n> ");
     char conteudo[512];
     fgets(conteudo, sizeof(conteudo), stdin);
     conteudo[strcspn(conteudo, "\n")] = 0;
     fprintf(f, "%s\n", conteudo);
-
     fclose(f);
-    printf("Documento enviado com sucesso para %s.\n", destino);
 }
 
+// Verifica ou cria a pasta de dados
 void verificar_ou_criar_pasta_data() {
     FILE* teste = fopen("data/.verifica", "r");
     if (teste) {

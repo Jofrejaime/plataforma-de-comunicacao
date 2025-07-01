@@ -29,9 +29,11 @@ typedef struct Membro {
     struct Membro* prox; // para encadeamento da hash
 } Membro;
 
-// Cria um novo membro
+// Cria um novo membro. Retorna NULL em caso de erro de alocação.
 Membro* criar_membro(const char* email, const char* senha, TipoMembro tipo, int salvar);
 // Imprime informações do membro (opcional para debug)
 void imprimir_membro(Membro* membro);
+// Libera memória de um membro e seus documentos
+void liberar_membro(Membro* membro);
 
 #endif

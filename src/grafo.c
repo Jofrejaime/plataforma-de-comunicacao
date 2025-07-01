@@ -1,13 +1,10 @@
 #include "grafo.h"
 #include "app.h"
 
-// Cria e inicializa um novo grafo
+// Cria e inicializa um novo grafo. Retorna NULL em caso de erro de alocação.
 Grafo* criar_grafo() {
     Grafo* g = (Grafo*)malloc(sizeof(Grafo));
-    if (!g) {
-        fprintf(stderr, "Erro ao alocar memória para o grafo.\n");
-        return NULL;
-    }
+    if (!g) return NULL;
     g->lista_vertices = NULL;
     return g;
 }
@@ -22,7 +19,7 @@ void verificar_ou_criar_pasta_mensagens() {
     }
 }
 
-// Busca um vértice pelo id
+// Busca um vértice pelo id. Retorna NULL se não encontrado ou erro.
 Vertice* buscar_vertice(Grafo* g, const char* id) {
     if (!g || !id) return NULL;
     Vertice* atual = g->lista_vertices;
@@ -34,14 +31,11 @@ Vertice* buscar_vertice(Grafo* g, const char* id) {
     return NULL;
 }
 
-// Adiciona um novo vértice se não existir
+// Adiciona um novo vértice se não existir. Retorna NULL em caso de erro.
 Vertice* adicionar_vertice(Grafo* g, const char* id) {
     if (!g || !id || buscar_vertice(g, id)) return NULL;
     Vertice* novo = (Vertice*)malloc(sizeof(Vertice));
-    if (!novo) {
-        fprintf(stderr, "Erro ao alocar memória para vértice.\n");
-        return NULL;
-    }
+    if (!novo) return NULL;
     strcpy(novo->id, id);
     novo->lista_adj = NULL;
     novo->prox = g->lista_vertices;
@@ -49,7 +43,7 @@ Vertice* adicionar_vertice(Grafo* g, const char* id) {
     return novo;
 }
 
-// Adiciona uma aresta entre dois vértices
+// Adiciona uma aresta entre dois vértices. Retorna 1 em caso de sucesso, 0 em caso de erro.
 int adicionar_aresta(Grafo* g, const char* origem, const char* destino, const char* conteudo) {
     if (!g || !origem || !destino || !conteudo) return 0;
     Vertice* v_origem = buscar_vertice(g, origem);
@@ -61,10 +55,7 @@ int adicionar_aresta(Grafo* g, const char* origem, const char* destino, const ch
         a = a->prox;
     }
     Aresta* nova = (Aresta*)malloc(sizeof(Aresta));
-    if (!nova) {
-        fprintf(stderr, "Erro ao alocar memória para aresta.\n");
-        return 0;
-    }
+    if (!nova) return 0;
     strcpy(nova->destino, destino);
     strcpy(nova->conteudo, conteudo);
     nova->prox = v_origem->lista_adj;
@@ -72,7 +63,7 @@ int adicionar_aresta(Grafo* g, const char* origem, const char* destino, const ch
     return 1;
 }
 
-// Imprime o grafo
+// Imprime o grafo (apenas exibe)
 void imprimir_grafo(Grafo* g) {
     if (!g) return;
     Vertice* v = g->lista_vertices;
@@ -88,7 +79,7 @@ void imprimir_grafo(Grafo* g) {
     }
 }
 
-// Registra uma comunicação e salva nos arquivos
+// Registra uma comunicação e salva nos arquivos. Retorna 1 em caso de sucesso, 0 em caso de erro.
 int registrar_comunicacao(Grafo* g, const char* origem, const char* destino, const char* conteudo) {
     if (!g || !origem || !destino || !conteudo) return 0;
     Vertice* v_origem = buscar_vertice(g, origem);
@@ -103,7 +94,7 @@ int registrar_comunicacao(Grafo* g, const char* origem, const char* destino, con
     }
     // Se ainda não existe, adiciona a aresta
     if (!atual) {
-        adicionar_aresta(g, origem, destino, conteudo);
+        if (!adicionar_aresta(g, origem, destino, conteudo)) return 0;
     }
     // Gera linha com data e hora
     char linha[512];
@@ -133,14 +124,11 @@ int registrar_comunicacao(Grafo* g, const char* origem, const char* destino, con
     return 1;
 }
 
-// Carrega mensagens dos arquivos para o grafo
+// Carrega mensagens dos arquivos para o grafo. Não imprime mensagens de erro, apenas retorna se falhar.
 void carregar_mensagens_para_grafo(Grafo* g, const char* pasta_mensagens) {
     if (!g || !pasta_mensagens) return;
     DIR* dir = opendir(pasta_mensagens);
-    if (!dir) {
-        printf("Erro: pasta %s não encontrada.\n", pasta_mensagens);
-        return;
-    }
+    if (!dir) return;
     struct dirent* ent;
     char path[256];
     char linha[512];
@@ -160,5 +148,33 @@ void carregar_mensagens_para_grafo(Grafo* g, const char* pasta_mensagens) {
         }
     }
     closedir(dir);
+}
+
+// Função para liberar memória de uma aresta
+void liberar_aresta(Aresta* a) {
+    while (a) {
+        Aresta* prox = a->prox;
+        free(a);
+        a = prox;
+    }
+}
+
+// Função para liberar memória de um vértice e suas arestas
+void liberar_vertice(Vertice* v) {
+    if (!v) return;
+    liberar_aresta(v->lista_adj);
+    free(v);
+}
+
+// Função para liberar todo o grafo
+void desalocar_grafo(Grafo* g) {
+    if (!g) return;
+    Vertice* v = g->lista_vertices;
+    while (v) {
+        Vertice* prox = v->prox;
+        liberar_vertice(v);
+        v = prox;
+    }
+    free(g);
 }
 
