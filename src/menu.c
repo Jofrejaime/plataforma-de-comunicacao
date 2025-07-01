@@ -142,7 +142,7 @@ void menu_admin(HashTable* ht, ListaEquipas* eqs) {
                 scanf("%d", &tipo);
                 getchar();
 
-                if (criar_equipa(eqs, nome_equipa, tipo)){
+                if (criar_equipa(eqs, nome_equipa, tipo, 1)) {
                     printf("Equipa criada com sucesso!\n");
                     Sleep(3000);
                     

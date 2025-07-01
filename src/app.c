@@ -13,7 +13,7 @@ bool registrar(HashTable* ht, const char* email, const char* senha, TipoMembro t
         return false;
     }
 
-    Membro* novo = criar_membro(email, senha, tipo);
+    Membro* novo = criar_membro(email, senha, tipo, 1);
     if (!novo || !inserir_membro(ht, novo)) {
         printf("Erro ao cadastrar!\n");
         Sleep(3000);
@@ -205,7 +205,7 @@ void carregar_membros(HashTable* ht) {
     int tipo, ativo;
 
     while (fscanf(f, "%s %s %d %d", email, senha, &tipo, &ativo) == 4) {
-        Membro* m = criar_membro(email, senha, tipo);
+        Membro* m = criar_membro(email, senha, tipo, 0);
         m->ativo = ativo;
         inserir_membro(ht, m);
     }

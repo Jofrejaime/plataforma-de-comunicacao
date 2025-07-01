@@ -1,6 +1,6 @@
 #include "membro.h"
 
-Membro* criar_membro(const char* email, const char* senha, TipoMembro tipo) {
+Membro* criar_membro(const char* email, const char* senha, TipoMembro tipo, int salvar) {
     Membro* novo = (Membro*)malloc(sizeof(Membro));
     if (!novo) return NULL;
     strcpy(novo->email, email);
@@ -12,6 +12,9 @@ Membro* criar_membro(const char* email, const char* senha, TipoMembro tipo) {
     novo->permisao[2] = 1;
     novo->documentos = NULL;
     novo->prox = NULL;
+    if (salvar) {
+        salvar_membro_em_ficheiro(novo);
+    }
     return novo;
 }
 

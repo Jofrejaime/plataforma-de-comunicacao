@@ -27,7 +27,8 @@ typedef struct Membro {
 } Membro;
 
 // Funções públicas
-Membro* criar_membro(const char* email, const char* senha, TipoMembro tipo);
+Membro* criar_membro(const char* email, const char* senha, TipoMembro tipo, int salvar); 
+
 void imprimir_membro(Membro* membro); // opcional para debug
 
 #endif

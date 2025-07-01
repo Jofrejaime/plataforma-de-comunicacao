@@ -28,7 +28,7 @@ typedef struct {
 
 // Funções públicas
 ListaEquipas* criar_lista_equipas();
-Equipa* criar_equipa(ListaEquipas* lista, const char* nome, TipoEquipa tipo);
+Equipa* criar_equipa(ListaEquipas* lista, const char* nome, TipoEquipa tipo, int salvar);
 Equipa* buscar_equipa(ListaEquipas* lista, const char* nome);
 int adicionar_membro_equipa(Equipa* e, const char* email);
 int remover_membro_equipa(Equipa* e, const char* email);

@@ -5,8 +5,7 @@ ListaEquipas* criar_lista_equipas() {
     if (lista) lista->lista = NULL;
     return lista;
 }
-
-Equipa* criar_equipa(ListaEquipas* lista, const char* nome, TipoEquipa tipo) {
+Equipa* criar_equipa(ListaEquipas* lista, const char* nome, TipoEquipa tipo, int salvar) {
     if (!lista || buscar_equipa(lista, nome)) return NULL;
 
     Equipa* nova = (Equipa*)malloc(sizeof(Equipa));
@@ -15,8 +14,10 @@ Equipa* criar_equipa(ListaEquipas* lista, const char* nome, TipoEquipa tipo) {
     nova->membros = NULL;
     nova->prox = lista->lista;
     lista->lista = nova;
-    salvar_todas_equipas(lista);
+    if (salvar)
+        salvar_todas_equipas(lista);
     return nova;
+
 }
 
 Equipa* buscar_equipa(ListaEquipas* lista, const char* nome) {
@@ -98,7 +99,7 @@ void carregar_equipas(ListaEquipas* lista) {
         if (!token) continue;
         tipo = atoi(token);
         if (tipo < 0 || tipo > 1) continue; // Verifica se o tipo é válido
-        Equipa* e = criar_equipa(lista, nome, tipo);
+        Equipa* e = criar_equipa(lista, nome, tipo, 0);
 
         // Adicionar membros
         while ((token = strtok(NULL, " \n")) != NULL) {
