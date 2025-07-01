@@ -9,15 +9,7 @@ Grafo* criar_grafo() {
     return g;
 }
 
-// Verifica se a pasta de mensagens existe, senão cria
-void verificar_ou_criar_pasta_mensagens() {
-    FILE* teste = fopen("mensagens/.verifica", "r");
-    if (teste) {
-        fclose(teste); // pasta já existe
-    } else {
-        MKDIR("mensagens");
-    }
-}
+
 
 // Busca um vértice pelo id. Retorna NULL se não encontrado ou erro.
 Vertice* buscar_vertice(Grafo* g, const char* id) {

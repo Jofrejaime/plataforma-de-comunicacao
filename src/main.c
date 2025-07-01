@@ -7,8 +7,9 @@
 
 int main() {
     setlocale(LC_ALL, "pt_PT.UTF-8");
-    verificar_ou_criar_pasta_data();
-    verificar_ou_criar_pasta_mensagens();
+    verificar_ou_criar_pasta("data");
+    verificar_ou_criar_pasta("mensagens");
+    verificar_ou_criar_pasta("documentos");
 
     // Alocação das estruturas principais com verificação de erro
     HashTable* ht = criar_hash();

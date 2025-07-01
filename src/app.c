@@ -1,4 +1,5 @@
 #include "app.h"
+#include "documento.h"
 
 // --- Funções de registro e login ---
 // Registra um novo membro. Retorna 1 em caso de sucesso, 0 em caso de erro.
@@ -181,38 +182,15 @@ int ft_strlen(char *pt[]) {
     return (i);
 }
 
-// Envia documento para um membro ou equipa
-void enviar_documento(const char* remetente, const char* destino, bool destino_e_equipa) {
-    if (!remetente || !destino) return;
-    char pasta[100];
-    snprintf(pasta, sizeof(pasta), "documentos/%s", remetente);
-    MKDIR(pasta);
-    time_t agora = time(NULL);
-    struct tm* tempo = localtime(&agora);
-    char data[11];
-    strftime(data, sizeof(data), "%Y-%m-%d", tempo);
-    char nome_ficheiro[200];
-    snprintf(nome_ficheiro, sizeof(nome_ficheiro), "%s/para_%s_%s.txt", pasta, destino, data);
-    FILE* f = fopen(nome_ficheiro, "w");
-    if (!f) return;
-    fprintf(f, "remetente: %s\n", remetente);
-    fprintf(f, "destino: %s\n", destino);
-    fprintf(f, "data: %s\n", data);
-    fprintf(f, "----------------------\n");
-    printf("Digite o conteúdo do documento:\n> ");
-    char conteudo[512];
-    fgets(conteudo, sizeof(conteudo), stdin);
-    conteudo[strcspn(conteudo, "\n")] = 0;
-    fprintf(f, "%s\n", conteudo);
-    fclose(f);
-}
 
-// Verifica ou cria a pasta de dados
-void verificar_ou_criar_pasta_data() {
-    FILE* teste = fopen("data/.verifica", "r");
+// Verifica se a pasta existe, e a cria se não existir
+void verificar_ou_criar_pasta(const char* nome_pasta) {
+    char path[256];
+    snprintf(path, sizeof(path), "%s/.verifica", nome_pasta);
+    FILE* teste = fopen(path, "r");
     if (teste) {
         fclose(teste); // pasta já existe
     } else {
-        MKDIR("data");
+        MKDIR(nome_pasta);
     }
 }

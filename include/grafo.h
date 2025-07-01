@@ -28,8 +28,6 @@ typedef struct {
     Vertice* lista_vertices;
 } Grafo;
 
-// Verifica ou cria a pasta de mensagens
-void verificar_ou_criar_pasta_mensagens();
 // Cria um novo grafo. Retorna NULL em caso de erro de alocação.
 Grafo* criar_grafo();
 // Busca um vértice pelo id. Retorna NULL se não encontrado ou erro.

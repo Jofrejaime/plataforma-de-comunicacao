@@ -35,8 +35,6 @@ bool enviar_mensagem(HashTable* ht, Grafo* g, const char* origem, const char* de
 bool enviar_mensagem_para_equipa(HashTable* ht, Grafo* g, ListaEquipas* eqs, const char* origem, const char* nome_equipa, const char* conteudo);
 // Lista mensagens comuns entre dois usuários
 void listar_mensagens_comuns(const char* usuario, const char* outro, bool destino_e_equipa);
-// Envia documento (parâmetro destino_e_equipa pode ser ignorado)
-void enviar_documento(const char* remetente, const char* destino, bool destino_e_equipa);
 
 // --- Membros ---
 // Carrega membros do ficheiro
@@ -50,7 +48,7 @@ void listar_permissao(Membro *m, char **permissao);
 
 // --- Utilitários ---
 // Verifica ou cria a pasta de dados
-void verificar_ou_criar_pasta_data();
+void verificar_ou_criar_pasta(const char* nome_pasta);
 // Retorna o número de strings em um array de strings terminado por NULL
 int ft_strlen(char **pt);
 
