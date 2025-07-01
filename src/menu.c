@@ -205,7 +205,7 @@ void menu_admin(HashTable* ht, ListaEquipas* eqs) {
                             Sleep(3000);
                     } else {
                         printf("Equipa não encontrada.\n");
-                            Sleep(3000);
+                        Sleep(3000);
                     }
                 }
                 break;

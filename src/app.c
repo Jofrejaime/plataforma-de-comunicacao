@@ -226,7 +226,7 @@ void	listar_permisao(Membro *m, char **permissao){
 void	actualizar_permissao(HashTable *ht, const char *email)
 {
 	char	*permissoes[] = {"1. Adicionar", "2. Excluir", "3 .Convidar", "4. voltar", NULL};
-	int select = 0, teclas = 0;
+	int select = 0;
 	
 	Membro *m = buscar_membro(ht, email);
 	
@@ -253,7 +253,6 @@ int	ft_strlen(char *pt[]){
 		i++;
 	return (i);
 }
-void enviar_documento(const char* remetente, const char* destino, bool destino_e_equipa) {
     // Criar pasta do remetente
     char pasta[100];
     snprintf(pasta, sizeof(pasta), "documentos/%s", remetente);

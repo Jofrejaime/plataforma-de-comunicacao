@@ -1,5 +1,6 @@
 #include "membro.h"
-
+#include "hash.h"
+#include "app.h"
 Membro* criar_membro(const char* email, const char* senha, TipoMembro tipo, int salvar) {
     Membro* novo = (Membro*)malloc(sizeof(Membro));
     if (!novo) return NULL;
