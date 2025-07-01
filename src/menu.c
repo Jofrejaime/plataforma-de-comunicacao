@@ -50,11 +50,14 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
             fgets(destino, sizeof(destino), stdin);
             destino[strcspn(destino, "\n")] = 0;
 
-            if (buscar_equipa(eqs, destino) || buscar_membro(ht, destino)) {
-                enviar_documento(usuario, destino, buscar_equipa(eqs, destino) != NULL);
-            } else {
+            bool is_equipa = buscar_equipa(eqs, destino) != NULL;
+            if (is_equipa || buscar_membro(ht, destino)) {
+                enviar_documento(usuario, destino, is_equipa);
+            }
+            else {
                 printf("Erro: destinatario não encontrado.\n");
                 Sleep(3000);
+                getch();
             }
         } else if (opcao == 0) {
             printf("Voltando ao menu principal...\n");
@@ -305,11 +308,8 @@ int	menu_iterativo(char **opcs)
 			if(teclas == 72)select = (select - 1) % size;
 			if(teclas == 80)select = (select + 1) % size;
 			if(select == -1)select = size - 1;
-		}else if(teclas == 13)             
-		{
-			if(select == size - 1)select = 0;
-			else select += 1; 
+		}else if(teclas == 13)// Enter
 			return (select);
-		}
+		
 	}	
 }

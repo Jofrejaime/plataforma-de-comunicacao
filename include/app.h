@@ -13,6 +13,15 @@
 #include "equipa.h"
 #include "membro.h"
 
+#ifdef _WIN32
+#include <direct.h>
+#define MKDIR(dir) _mkdir(dir)
+#else
+#include <sys/stat.h>
+#include <sys/types.h>
+#define MKDIR(dir) mkdir(dir, 0777)
+#endif
+
 bool 	login(HashTable* ht, Grafo* g, ListaEquipas* eqs, char* email, char* senha);
 bool 	registrar(HashTable* ht, const char* email, const char* senha, TipoMembro tipo);
 bool 	enviar_mensagem(HashTable* ht, Grafo* g, const char* origem, const char* destino, const char* conteudo);

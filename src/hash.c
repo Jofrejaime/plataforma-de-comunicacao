@@ -1,6 +1,7 @@
 #include "hash.h"
 
 int hash(const char* email) {
+    if (!email) return 0;
     int soma = 0;
     for (int i = 0; email[i] != '\0'; i++)
         soma += email[i];

@@ -38,21 +38,22 @@ Vertice* adicionar_vertice(Grafo* g, const char* id) {
 
 int adicionar_aresta(Grafo* g, const char* origem, const char* destino, const char* conteudo) {
     Vertice* v_origem = buscar_vertice(g, origem);
-    if (!v_origem)
-        v_origem = adicionar_vertice(g, origem);
+    if (!v_origem) v_origem = adicionar_vertice(g, origem);
 
-    Vertice* v_destino = buscar_vertice(g, destino);
-    if (!v_destino)
-        v_destino = adicionar_vertice(g, destino);
+    Aresta* a = v_origem->lista_adj;
+    while (a) {
+        if (strcmp(a->destino, destino) == 0) return 0; // já existe
+        a = a->prox;
+    }
 
     Aresta* nova = (Aresta*)malloc(sizeof(Aresta));
     strcpy(nova->destino, destino);
     strcpy(nova->conteudo, conteudo);
     nova->prox = v_origem->lista_adj;
     v_origem->lista_adj = nova;
-
     return 1;
 }
+
 
 void imprimir_grafo(Grafo* g) {
     Vertice* v = g->lista_vertices;

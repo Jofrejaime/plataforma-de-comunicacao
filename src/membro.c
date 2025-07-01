@@ -16,8 +16,16 @@ Membro* criar_membro(const char* email, const char* senha, TipoMembro tipo) {
 }
 
 void imprimir_membro(Membro* membro) {
-    if (!membro) return;
+    const char* tipo_str[] = {"ADMIN", "CORPORATIVO", "CONVIDADO"};
+    const char* permissoes[] = {"Adicionar", "Excluir", "Convidar"};
+    if (!membro) {
+        printf("Membro não encontrado.\n");
+        return;
+    }
     printf("Email: %s\n", membro->email);
-    printf("Tipo: %d\n", membro->tipo);
-    printf("Ativo: %d\n", membro->ativo);
+    printf("Tipo: %s\n", tipo_str[membro->tipo]);
+    printf("\tPermissões:\n");
+    for (int i = 0; i < 3; i++)
+        printf("\t%s: %s\n", permissoes[i], membro->permisao[i] ? "Ativo" : "Desativado");
+    printf("Ativo: %s\n", membro->ativo ? "Sim" : "Não");
 }

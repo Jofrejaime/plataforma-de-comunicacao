@@ -9,14 +9,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-
-#ifdef _WIN32
-    #include <direct.h>
-    #define MKDIR(nome) _mkdir(nome)
-#else
-    #include <sys/stat.h>
-    #define MKDIR(nome) mkdir(nome, 0777)
-#endif
 typedef struct Aresta {
     char destino[100]; // Pode ser email ou nome da equipa
     char conteudo[256];

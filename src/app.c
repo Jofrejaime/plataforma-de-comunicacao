@@ -43,7 +43,7 @@ void listar_mensagens_comuns(const char* usuario, const char* outro, bool destin
         return;
     }
 
-    printf("\n📨 Histórico com %s:\n", outro);
+    printf("\nHistórico com %s:\n", outro);
 
     char linha[512];
     char ultima_data[6] = "";
@@ -78,7 +78,7 @@ void listar_mensagens_comuns(const char* usuario, const char* outro, bool destin
 
                 // Cabeçalho de data (📅)
                 if (strcmp(data_md, ultima_data) != 0) {
-                    printf("\n\t📅 %s\n", data_md);
+                    printf("\n\t %s\n", data_md);
                     strcpy(ultima_data, data_md);
                 }
 
@@ -288,7 +288,7 @@ void enviar_documento(const char* remetente, const char* destino, bool destino_e
     fprintf(f, "%s\n", conteudo);
 
     fclose(f);
-    printf("📎 Documento enviado com sucesso para %s.\n", destino);
+    printf("Documento enviado com sucesso para %s.\n", destino);
 }
 
 void verificar_ou_criar_pasta_data() {

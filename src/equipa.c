@@ -95,8 +95,9 @@ void carregar_equipas(ListaEquipas* lista) {
         strcpy(nome, token);
 
         token = strtok(NULL, " ");
+        if (!token) continue;
         tipo = atoi(token);
-
+        if (tipo < 0 || tipo > 1) continue; // Verifica se o tipo é válido
         Equipa* e = criar_equipa(lista, nome, tipo);
 
         // Adicionar membros

@@ -28,9 +28,12 @@ int main() {
                 break;
             case 0:
                 printf("Saindo...\n");
+                Sleep(3000);
                 break;
             default:
                 printf("Opção inválida.\n");
+                Sleep(3000);
+                break;
         }
 
     } while (opcao != 0);
