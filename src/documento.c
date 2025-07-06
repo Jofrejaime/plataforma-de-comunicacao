@@ -49,8 +49,8 @@ void enviar_documento(const char* remetente, const char* destino) {
     printf("Digite o conteúdo do documento:\n> ");
     fgets(conteudo, sizeof(conteudo), stdin);
     conteudo[strcspn(conteudo, "\n")] = 0;
-    // Novo formato: rem;dest;data;conteudo\n
-    fprintf(f, "%s;%s;%s;%s\n", remetente, destino, data, conteudo);
+    // Salva apenas o conteúdo puro no arquivo do documento
+    fprintf(f, "%s\n", conteudo);
     fclose(f);
     // Registro nos logs de documentos enviados e recebidos
     registrar_documento(remetente, "ENVIADO", destino, data, nome_ficheiro);

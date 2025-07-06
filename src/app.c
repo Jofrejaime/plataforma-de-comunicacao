@@ -47,10 +47,10 @@ void listar_mensagens_comuns(const char* usuario, const char* outro, bool destin
     char last_date[11] = ""; // yyyy-mm-dd\0
     char last_year[5] = "";
     int encontrou = 0;
+        printf(" ");
     while (fgets(linha, sizeof(linha), f)) {
         char datahora[32], ori[100], des[100], msg[256];
         int lidos = sscanf(linha, "%31[^;];%99[^;];%99[^;];%255[^\n]", datahora, ori, des, msg);
-         printf("");
         if (lidos == 4) {
             int deve_mostrar = 0;
             if (destino_e_equipa) {

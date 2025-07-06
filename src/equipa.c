@@ -10,7 +10,7 @@ ListaEquipas* criar_lista_equipas() {
 
 // Cria uma nova equipa e adiciona à lista. Retorna NULL em caso de erro ou se já existir.
 Equipa* criar_equipa(ListaEquipas* lista, const char* nome, TipoEquipa tipo, int salvar) {
-    if (!lista || !nome || buscar_equipa(lista, nome)) return NULL;
+    if (!lista || !nome || strlen(nome) == 0 || buscar_equipa(lista, nome)) return NULL;
     Equipa* nova = (Equipa*)malloc(sizeof(Equipa));
     if (!nova) return NULL;
     strcpy(nova->nome, nome);

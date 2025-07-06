@@ -20,17 +20,33 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
             printf("Destino (email ou equipa): ");
             fgets(destino, sizeof(destino), stdin);
             destino[strcspn(destino, "\n")] = 0;
-            if (buscar_equipa(eqs, destino)) {
-                listar_mensagens_comuns(usuario, destino, true);
-                printf("\nNova mensagem para equipa: ");
-                fgets(conteudo, sizeof(conteudo), stdin);
-                conteudo[strcspn(conteudo, "\n")] = 0;
-                int ok = enviar_mensagem_para_equipa(ht, g, eqs, usuario, destino, conteudo);
-                if (ok)
-                    printf("Mensagem enviada para a equipa com sucesso!\n");
-                else
-                    printf("Erro ao enviar mensagem para a equipa. Verifique permissões ou existência.\n");
-                Sleep(3000);
+            Equipa* eq = buscar_equipa(eqs, destino);
+            if (eq) {
+                // Verifica se o usuário faz parte da equipa
+                int membro = 0;
+                MembroEquipa* me = eq->membros;
+                while (me) {
+                    if (strcmp(me->email, usuario) == 0) {
+                        membro = 1;
+                        break;
+                    }
+                    me = me->prox;
+                }
+                if (membro) {
+                    listar_mensagens_comuns(usuario, destino, true);
+                    printf("\nNova mensagem para equipa: ");
+                    fgets(conteudo, sizeof(conteudo), stdin);
+                    conteudo[strcspn(conteudo, "\n")] = 0;
+                    int ok = enviar_mensagem_para_equipa(ht, g, eqs, usuario, destino, conteudo);
+                    if (ok)
+                        printf("Mensagem enviada para a equipa com sucesso!\n");
+                    else
+                        printf("Erro ao enviar mensagem para a equipa. Verifique permissões ou existência.\n");
+                    Sleep(3000);
+                } else {
+                    printf("Você não faz parte desta equipa.\n");
+                    Sleep(3000);
+                }
             } else if (buscar_membro(ht, destino)) {
                 listar_mensagens_comuns(usuario, destino, false);
                 printf("\nNova mensagem: ");
@@ -102,8 +118,8 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
 }
 
 int mostrar_menu_principal() {
-	char *opcs[] = {"1. Login", "2. Registrar", "0. Sair", NULL};
-	return (menu_iterativo(opcs));
+    char *opcs[] = {"1. Login", "2. Registrar", "0. Sair", NULL};
+    return (menu_iterativo(opcs));
 }
 
 void menu_login(HashTable* ht, Grafo* g, ListaEquipas* eqs) {
@@ -149,16 +165,16 @@ void menu_admin(HashTable* ht, ListaEquipas* eqs) {
     int opcao, tipo;
     char nome_equipa[100], email[100];
     char *menu[] = {
-	"1. Criar equipa", 
-	"2. Adicionar membro a equipa", 
-	"3. Remover membro de equipa",
-	"4. Actualizar permissoes",
-	"5. Listar equipas",
-	"0. Voltar",
-	 NULL
-	};
-	
-	do{
+    "1. Criar equipa", 
+    "2. Adicionar membro a equipa", 
+    "3. Remover membro de equipa",
+    "4. Actualizar permissoes",
+    "5. Listar equipas",
+    "0. Voltar",
+     NULL
+    };
+    
+    do{
           opcao = menu_iterativo(menu);
 
         switch (opcao) {
@@ -230,10 +246,10 @@ void menu_admin(HashTable* ht, ListaEquipas* eqs) {
                 scanf("%s",email);
                 actualizar_permissao(ht, email);
                 break;
-			case 5:
-				imprimir_equipas(eqs);
-				getch();
-				break;
+            case 5:
+                imprimir_equipas(eqs);
+                getch();
+                break;
             case 0:
                 printf("Voltando ao menu anterior...\n");
                 break;
@@ -306,29 +322,29 @@ void menu_equipas_membro(const char* email, TipoMembro tipo, ListaEquipas* eqs) 
 
 int	menu_iterativo(char **opcs)
 {
-	int select = 0,  teclas;
-	int size = ft_strlen(opcs);
-	
-	while (1){
-		system("cls");
-		for (int i = 0; i < size; i++){
-			if (i == select) printf(">> \033[1;36m %s \033[0m\n", opcs[i]);
-			else printf(" %s\n", opcs[i]);
-		}
-		
-		teclas = _getch();// lê um primeiro valor ( 0 ou 224) só depois lê o valor da tecla
-		
-		if(teclas == 224 || teclas == 0){
-			teclas = _getch();
-			if(teclas == 72)select = (select - 1) % size;
-			if(teclas == 80)select = (select + 1) % size;
-			if(select == -1)select = size - 1;
-		}else if(teclas == 13)// Enter
+    int select = 0,  teclas;
+    int size = ft_strlen(opcs);
+    
+    while (1){
+        system("cls");
+        for (int i = 0; i < size; i++){
+            if (i == select) printf(">> \033[1;36m %s \033[0m\n", opcs[i]);
+            else printf(" %s\n", opcs[i]);
+        }
+        
+        teclas = _getch();// lê um primeiro valor ( 0 ou 224) só depois lê o valor da tecla
+        
+        if(teclas == 224 || teclas == 0){
+            teclas = _getch();
+            if(teclas == 72)select = (select - 1) % size;
+            if(teclas == 80)select = (select + 1) % size;
+            if(select == -1)select = size - 1;
+        }else if(teclas == 13)// Enter
         {
           if (select == size - 1) select = 0;
             else select += 1;
-			return (select);
+            return (select);
         }
-		
-	}	
+        
+    }	
 }

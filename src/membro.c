@@ -16,9 +16,6 @@ Membro* criar_membro(const char* email, const char* senha, TipoMembro tipo, int 
     novo->permissao[2] = 1;
     novo->documentos = NULL;
     novo->prox = NULL;
-    if (salvar) {
-        salvar_membro_em_ficheiro(novo);
-    }
     return novo;
 }
 
