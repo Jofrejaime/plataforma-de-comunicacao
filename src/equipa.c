@@ -1,7 +1,7 @@
 #include "../include/equipa.h"
 
 // Cria uma nova lista de equipas. Retorna NULL em caso de erro de alocação.
-ListaEquipas* criar_lista_equipas() {
+ListaEquipas* criar_lista_equipas(void) {
     ListaEquipas* lista = (ListaEquipas*)malloc(sizeof(ListaEquipas));
     if (!lista) return NULL;
     lista->lista = NULL;

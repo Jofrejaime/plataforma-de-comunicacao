@@ -14,7 +14,7 @@ typedef struct {
 } HashTable;
 
 // Cria uma nova tabela hash. Retorna NULL em caso de erro de alocação.
-HashTable* criar_hash();
+HashTable* criar_hash(void);
 // Função de hash para emails. Retorna 0 se email for NULL.
 int hash(const char* email);
 // Insere um membro na tabela hash. Retorna 1 em caso de sucesso, 0 em caso de erro.

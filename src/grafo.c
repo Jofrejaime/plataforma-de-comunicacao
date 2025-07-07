@@ -2,7 +2,7 @@
 #include "../include/app.h"
 
 // Cria e inicializa um novo grafo. Retorna NULL em caso de erro de alocação.
-Grafo* criar_grafo() {
+Grafo* criar_grafo(void) {
     Grafo* g = (Grafo*)malloc(sizeof(Grafo));
     if (!g) return NULL;
     g->lista_vertices = NULL;

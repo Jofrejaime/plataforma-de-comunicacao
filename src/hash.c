@@ -11,7 +11,7 @@ int hash(const char* email) {
 }
 
 // Cria uma nova tabela hash. Retorna NULL em caso de erro de alocação.
-HashTable* criar_hash() {
+HashTable* criar_hash(void) {
 	int i;
     HashTable* ht = (HashTable*)malloc(sizeof(HashTable));
     if (!ht) return NULL;

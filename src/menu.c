@@ -10,7 +10,7 @@ void imprimir_cabecalho(const char* titulo) {
     printf("+==============================================================+\n");
 }
 
-void imprimir_separador() {
+void imprimir_separador(void) {
     printf("\n--------------------------------------------------------------\n");
 }
 
@@ -49,7 +49,7 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
     Membro* m;
     Equipa* eq;
     int membro;
-    MembroEquipa* me;
+    MembroEquipa* membro_equipa;
     int ok;
     int is_equipa;
     int encontrou;
@@ -70,13 +70,13 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
             if (eq) {
                 /* Verifica se o usuário faz parte da equipa */
                 membro = 0;
-                me = eq->membros;
-                while (me) {
-                    if (strcmp(me->email, usuario) == 0) {
+                membro_equipa = eq->membros;
+                while (membro_equipa) {
+                    if (strcmp(membro_equipa->email, usuario) == 0) {
                         membro = 1;
                         break;
                     }
-                    me = me->prox;
+                    membro_equipa = membro_equipa->prox;
                 }
                 if (membro) {
                     printf("\nHistorico de mensagens da equipa '%s':\n", destino);
@@ -176,14 +176,14 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
             mensagem_info("Voltando ao menu principal...");
             Sleep(1000);
         } else if (opcao != 0) {
-            mensagem_erro("Opção inválida! Selecione uma opção válida.");
+            mensagem_erro("Opcao invalida! Selecione uma opcao valida.");
         }
     } while (opcao != 0);
     printf("\nObrigado por usar a plataforma! Ate logo...\n");
     Sleep(2000);
 }
 
-int mostrar_menu_principal() {
+int mostrar_menu_principal(void) {
     char *opcs[] = {"1. Fazer Login", "2. Registrar-se", "0. Sair", NULL};
     imprimir_cabecalho("BEM-VINDO A PLATAFORMA DE COMUNICACAO");
     return (menu_iterativo(opcs));
@@ -205,9 +205,9 @@ void menu_login(HashTable* ht, Grafo* g, ListaEquipas* eqs) {
     
     ok = login(ht, g, eqs, email, senha);
     if (ok) {
-        mensagem_sucesso("Login realizado com sucesso! Bem-vindo à plataforma!");
+        mensagem_sucesso("Login realizado com sucesso! Bem-vindo a plataforma!");
     } else {
-        mensagem_erro("Falha na autenticação! Verifique email, senha ou status da conta.");
+        mensagem_erro("Falha na autenticacao! Verifique email, senha ou status da conta.");
     }
 }
 

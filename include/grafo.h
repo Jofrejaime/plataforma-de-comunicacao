@@ -29,7 +29,7 @@ typedef struct {
 } Grafo;
 
 // Cria um novo grafo. Retorna NULL em caso de erro de alocação.
-Grafo* criar_grafo();
+Grafo* criar_grafo(void);
 // Busca um vértice pelo id. Retorna NULL se não encontrado ou erro.
 Vertice* buscar_vertice(Grafo* g, const char* id);
 // Adiciona um vértice ao grafo. Retorna NULL em caso de erro.

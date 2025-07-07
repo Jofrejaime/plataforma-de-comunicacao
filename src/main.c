@@ -5,7 +5,7 @@
 #include "../include/app.h"
 #include <locale.h>
 
-int main() {
+int main(void) {
     HashTable* ht;
     Grafo* g;
     ListaEquipas* eqs;

@@ -31,7 +31,7 @@ typedef struct {
 } ListaEquipas;
 
 // Cria uma nova lista de equipas. Retorna NULL em caso de erro de alocação.
-ListaEquipas* criar_lista_equipas();
+ListaEquipas* criar_lista_equipas(void);
 // Cria uma nova equipa e adiciona à lista. Retorna NULL em caso de erro ou se já existir.
 Equipa* criar_equipa(ListaEquipas* lista, const char* nome, TipoEquipa tipo, int salvar);
 // Busca uma equipa pelo nome. Retorna ponteiro ou NULL se não encontrada.
