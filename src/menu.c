@@ -43,7 +43,10 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
         "3. Enviar documento",
         "4. Convidar membro",
         "5. Listar meus documentos",
-        "6. Visualizar meu perfil",
+        "6. Adicionar Membro",
+        "7. Remover Membro",
+        "8. Visualizar meu perfil",
+        "9. Bloquear/Desbloquear membro",
         "0. Sair",
         NULL
     };
@@ -169,13 +172,68 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
                     mensagem_erro("Falha ao desbloquear! Membro pode nao estar bloqueado.");
                 }
             }
-        } else if (opcao == 6) {
+        } else if (opcao == 5) {
             imprimir_cabecalho("MEUS DOCUMENTOS");
             listar_documentos(usuario);
             imprimir_separador();
             printf("Pressione qualquer tecla para voltar ao menu...");
             getch();
-        } else if (opcao == 6) {
+        } else if(opcao == 6)
+        {
+        	if (m->permissao[0] == 1)
+        	{
+        		 printf("Nome da equipa: ");
+                fgets(nome_equipa, sizeof(nome_equipa), stdin);
+                nome_equipa[strcspn(nome_equipa, "\n")] = 0;
+                printf("Email do membro: ");
+                fgets(email, sizeof(email), stdin);
+                email[strcspn(email, "\n")] = 0;
+                Equipa* e = buscar_equipa(eqs, nome_equipa);
+                Membro* m = buscar_membro(ht, email);
+                if (e && m && m->ativo) {
+                    int ok = adicionar_membro_equipa(e, email);
+                    if (ok) {
+                        printf("\033[1;32m Membro adicionado com sucesso!\033[0m\n");
+                        salvar_todas_equipas(eqs);
+                    } else {
+                        printf("\033[1;31m Membro ja esta na equipa ou erro ao adicionar.\033[0m\n");
+                    }
+                } else {
+                    printf("\033[1;31m Equipa ou membro inv�lido.\033[0m\n");
+                }
+                Sleep(3000);
+			}else{
+				printf("\033[1;31m Nao possui perminssao para esta accao!\033[0m\n");
+				Sleep(3000);
+			}
+		}else if(opcao == 7)
+		{
+			if(m->permissao[1] == 1)
+			{
+				 printf("Nome da equipa: ");
+                fgets(nome_equipa, sizeof(nome_equipa), stdin);
+                nome_equipa[strcspn(nome_equipa, "\n")] = 0;
+                printf("Email do membro: ");
+                fgets(email, sizeof(email), stdin);
+                email[strcspn(email, "\n")] = 0;
+                Equipa* e = buscar_equipa(eqs, nome_equipa);
+                if (e) {
+                    int ok = remover_membro_equipa(e, email);
+                    if (ok) {
+                        salvar_todas_equipas(eqs);
+                        printf("\033[1;32m Membro removido com sucesso!\033[0m\n");
+                    } else {
+                        printf("\033[1;31m Membro nao encontrado na equipa ou erro ao remover.\033[0m\n");
+                    }
+                } else {
+                    printf("\033[1;31m Equipa nao encontrada.\033[0m\n");
+                }
+			}else
+			{
+				printf("\033[1;31m Nao possui permissao para esta accao\033[0m\n");
+			}
+			 Sleep(3000);
+		}else if (opcao == 8) {
             imprimir_cabecalho("MEU PERFIL");
             printf("Email: %s\n", m->email);
             printf("Tipo: %s\n", m->tipo == 0 ? "ADMINISTRADOR" : (m->tipo == 1 ? "CORPORATIVO" : "CONVIDADO"));
