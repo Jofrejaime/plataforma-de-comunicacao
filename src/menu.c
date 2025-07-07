@@ -2,7 +2,7 @@
 
 /* Funções auxiliares para interface */
 void imprimir_cabecalho(const char* titulo) {
-    printf("\n");
+    system("cls");
     printf("+==============================================================+\n");
     printf("|                    PLATAFORMA DE COMUNICACAO                 |\n");
     printf("+==============================================================+\n");
@@ -40,8 +40,9 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
         "1. Enviar mensagem",
         "2. Ver equipas",
         "3. Enviar documento",
-        "4. Listar meus documentos",
-        "5. Visualizar meu perfil",
+        "4. Convidar membro",
+        "5. Listar meus documentos",
+        "6. Visualizar meu perfil",
         "0. Sair",
         NULL
     };
@@ -125,12 +126,26 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
                 mensagem_erro("Destinatário não encontrado! Verifique o email ou nome da equipa.");
             }
         } else if (opcao == 4) {
+            imprimir_cabecalho("CONVIDAR MEMBRO");
+            printf("Digite o email do convidado:\n> ");
+            fgets(destino, sizeof(destino), stdin);
+            destino[strcspn(destino, "\n")] = 0;
+            
+            sprintf(conteudo, "123456");
+            ok = registrar(ht, destino, conteudo, CONVIDADO);
+            if (ok) {
+                printf("\n[INFO] Senha gerada automaticamente: 123456\n");
+                mensagem_sucesso("Membro convidado criado! Senha: 123456");
+            } else {
+                mensagem_erro("Falha ao criar convite! Email pode ja existir.");
+            }
+        } else if (opcao == 5) {
             imprimir_cabecalho("MEUS DOCUMENTOS");
             listar_documentos(usuario);
             imprimir_separador();
             printf("Pressione qualquer tecla para voltar ao menu...");
             getch();
-        } else if (opcao == 5) {
+        } else if (opcao == 6) {
             imprimir_cabecalho("MEU PERFIL");
             printf("Email: %s\n", m->email);
             printf("Tipo: %s\n", m->tipo == 0 ? "ADMINISTRADOR" : (m->tipo == 1 ? "CORPORATIVO" : "CONVIDADO"));
@@ -196,31 +211,48 @@ void menu_login(HashTable* ht, Grafo* g, ListaEquipas* eqs) {
     }
 }
 
+int contar_membros(HashTable* ht) {
+    int count = 0;
+    int i;
+    for (i = 0; i < TAM_HASH; i++) {
+        Membro* atual = ht->tabela[i];
+        while (atual) {
+            count++;
+            atual = atual->prox;
+        }
+    }
+    return count;
+}
+
 void menu_registro(HashTable* ht) {
     char email[100], senha[50];
     int tipo;
     int ok;
+    int total_membros;
 
     imprimir_cabecalho("REGISTRO DE NOVO MEMBRO");
     printf("Digite seu email:\n> ");
     scanf("%s", email);
     printf("Crie uma senha:\n> ");
     scanf("%s", senha);
-    printf("\nSelecione o tipo de conta:\n");
-    printf("   0 - ADMINISTRADOR\n");
-    printf("   1 - CORPORATIVO\n");
-    printf("   2 - CONVIDADO\n");
-    printf("> ");
-    scanf("%d", &tipo);
+    
+    total_membros = contar_membros(ht);
+    if (total_membros == 0) {
+        tipo = ADMIN;
+        printf("\n[INFO] Primeiro usuario - Tipo: ADMINISTRADOR\n");
+    } else {
+        tipo = CORPORATIVO;
+        printf("\n[INFO] Tipo de conta: CORPORATIVO\n");
+    }
 
     printf("\nProcessando registro...");
     Sleep(1000);
     
     ok = registrar(ht, email, senha, (TipoMembro)tipo);
     if (ok)
-        mensagem_sucesso("Conta criada com sucesso! Você já pode fazer login.");
+        mensagem_sucesso("Conta criada com sucesso! Voce ja pode fazer login.");
     else
-        mensagem_erro("Falha no registro! Email pode já existir ou dados inválidos.");
+        mensagem_erro("Falha no registro! Email pode ja existir ou dados invalidos.");
 }
 
 void menu_admin(HashTable* ht, ListaEquipas* eqs) {
@@ -233,8 +265,9 @@ void menu_admin(HashTable* ht, ListaEquipas* eqs) {
     "1. Criar nova equipa", 
     "2. Adicionar membro a equipa", 
     "3. Remover membro da equipa",
-    "4. Atualizar permissoes",
-    "5. Listar todas as equipas",
+    "4. Convidar membro para plataforma",
+    "5. Atualizar permissoes",
+    "6. Listar todas as equipas",
     "0. Voltar",
      NULL
     };
@@ -311,6 +344,22 @@ void menu_admin(HashTable* ht, ListaEquipas* eqs) {
                 break;
 
             case 4:
+                imprimir_cabecalho("CONVIDAR MEMBRO PARA PLATAFORMA");
+                printf("Digite o email do convidado:\n> ");
+                scanf("%s", email);
+                getchar();
+                
+                sprintf(nome_equipa, "123456");
+                ok = registrar(ht, email, nome_equipa, CONVIDADO);
+                if (ok) {
+                    printf("\n[INFO] Senha gerada automaticamente: 123456\n");
+                    mensagem_sucesso("Membro convidado criado! Senha: 123456");
+                } else {
+                    mensagem_erro("Falha ao criar convite! Email pode ja existir.");
+                }
+                break;
+                
+            case 5:
                 imprimir_cabecalho("ATUALIZAR PERMISSOES");
                 printf("Digite o email do usuario:\n> ");
                 scanf("%s",email);
@@ -318,7 +367,7 @@ void menu_admin(HashTable* ht, ListaEquipas* eqs) {
                 actualizar_permissao(ht, email);
                 break;
                 
-            case 5:
+            case 6:
                 imprimir_cabecalho("LISTA DE EQUIPAS");
                 imprimir_equipas(eqs);
                 imprimir_separador();
@@ -336,6 +385,62 @@ void menu_admin(HashTable* ht, ListaEquipas* eqs) {
         }
 
     } while (opcao != 0);
+}
+
+void menu_convidado(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* eqs) {
+    int opcao;
+    char titulo[100];
+    char *opcs[] = {
+        "1. Ver minhas equipas",
+        "2. Visualizar meu perfil",
+        "0. Sair",
+        NULL
+    };
+    Membro* m;
+    Equipa* eq;
+    int encontrou;
+    
+    m = buscar_membro(ht, usuario);
+    do {
+        sprintf(titulo, "MENU CONVIDADO - Usuario: %s", usuario);
+        imprimir_cabecalho(titulo);
+        opcao = menu_iterativo(opcs);
+        
+        if (opcao == 1) {
+            menu_equipas_membro(usuario, m->tipo, eqs);
+        } else if (opcao == 2) {
+            imprimir_cabecalho("MEU PERFIL");
+            printf("Email: %s\n", m->email);
+            printf("Tipo: CONVIDADO\n");
+            printf("Equipas: ");
+            encontrou = 0;
+            eq = eqs->lista;
+            while (eq) {
+                MembroEquipa* me = eq->membros;
+                while (me) {
+                    if (strcmp(me->email, m->email) == 0) {
+                        printf("%s ", eq->nome);
+                        encontrou = 1;
+                        break;
+                    }
+                    me = me->prox;
+                }
+                eq = eq->prox;
+            }
+            if (!encontrou) printf("(Nenhuma equipa)\n");
+            else printf("\n");
+            imprimir_separador();
+            printf("Pressione qualquer tecla para voltar ao menu...");
+            getch();
+        } else if (opcao == 0) {
+            mensagem_info("Voltando ao menu principal...");
+            Sleep(1000);
+        } else if (opcao != 0) {
+            mensagem_erro("Opcao invalida! Selecione uma opcao valida.");
+        }
+    } while (opcao != 0);
+    printf("\nObrigado por usar a plataforma! Ate logo...\n");
+    Sleep(2000);
 }
 
 void menu_equipas_membro(const char* email, TipoMembro tipo, ListaEquipas* eqs) {
@@ -384,9 +489,9 @@ void menu_equipas_membro(const char* email, TipoMembro tipo, ListaEquipas* eqs) 
             return;
         }
 
-        printf("\n 0. Voltar\n");
+        printf("\n0. Voltar\n");
         imprimir_separador();
-        printf("👥 Escolha uma equipa para ver os membros:\n▶ ");
+        printf("Escolha uma equipa para ver os membros:\n> ");
         scanf("%d", &opcao);
         getchar();
 
@@ -411,20 +516,20 @@ int	menu_iterativo(char **opcs)
     
     while (1){
         printf("\n");
-        printf("┌──────────────────────────────────────────────────────────────┐\n");
-        printf("│                     SELECIONE UMA OPÇÃO                    │\n");
-        printf("├──────────────────────────────────────────────────────────────┤\n");
+        printf("+--------------------------------------------------------------+\n");
+        printf("|                     SELECIONE UMA OPCAO                     |\n");
+        printf("+--------------------------------------------------------------+\n");
         
         for (i = 0; i < size; i++){
             if (i == select) {
-                printf("│ ▶ \033[1;36m%-58s\033[0m │\n", opcs[i]);
+                printf("| > \033[1;36m%-58s\033[0m |\n", opcs[i]);
             } else {
-                printf("│   %-58s │\n", opcs[i]);
+                printf("|   %-58s |\n", opcs[i]);
             }
         }
         
-        printf("└──────────────────────────────────────────────────────────────┘\n");
-        printf("\nℹ Use as setas ↑↓ para navegar e ENTER para selecionar\n");
+        printf("+--------------------------------------------------------------+\n");
+        printf("\nUse as setas para navegar e ENTER para selecionar\n");
         
         teclas = _getch(); /* lê um primeiro valor ( 0 ou 224) só depois lê o valor da tecla */
         

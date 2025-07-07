@@ -1,6 +1,9 @@
 #include "../include/app.h"
 #include "../include/documento.h"
-
+#include "../include/membro.h"
+#include "../include/hash.h"
+#include "../include/grafo.h"
+#include "../include/menu.h"
 // --- Funções de registro e login ---
 // Registra um novo membro. Retorna 1 em caso de sucesso, 0 em caso de erro.
 int registrar(HashTable* ht, const char* email, const char* senha, TipoMembro tipo) {
