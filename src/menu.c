@@ -3,24 +3,19 @@
 void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* eqs) {
     int opcao;
     char destino[100], conteudo[256];
+    char nome_equipa[100], email[100];
     char *opcs[] = {
         "1. Enviar mensagem",
         "2. Ver equipas",
         "3. Enviar documento",
         "4. Listar meus documentos",
-        "5. Visualizar meu perfil",
+        "5. Adicionar membros a equipa",
+        "6. Remover Membro da equipa",
+        "7. Visualizar meu perfil",
         "0. Sair",
         NULL
     };
-    Membro* m;
-    Equipa* eq;
-    int membro;
-    MembroEquipa* me;
-    int ok;
-    int is_equipa;
-    int encontrou;
-    
-    m = buscar_membro(ht, usuario);
+    Membro* m = buscar_membro(ht, usuario);
     do {
         printf("\n--- Plataforma (%s) ---\n", usuario);
         opcao = menu_iterativo(opcs);
@@ -28,11 +23,11 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
             printf("Destino (email ou equipa): ");
             fgets(destino, sizeof(destino), stdin);
             destino[strcspn(destino, "\n")] = 0;
-            eq = buscar_equipa(eqs, destino);
+            Equipa* eq = buscar_equipa(eqs, destino);
             if (eq) {
-                /* Verifica se o usu√°rio faz parte da equipa */
-                membro = 0;
-                me = eq->membros;
+                // Verifica se o usu·rio faz parte da equipa
+                int membro = 0;
+                MembroEquipa* me = eq->membros;
                 while (me) {
                     if (strcmp(me->email, usuario) == 0) {
                         membro = 1;
@@ -45,14 +40,14 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
                     printf("\nNova mensagem para equipa: ");
                     fgets(conteudo, sizeof(conteudo), stdin);
                     conteudo[strcspn(conteudo, "\n")] = 0;
-                    ok = enviar_mensagem_para_equipa(ht, g, eqs, usuario, destino, conteudo);
+                    int ok = enviar_mensagem_para_equipa(ht, g, eqs, usuario, destino, conteudo);
                     if (ok)
-                        printf("Mensagem enviada para a equipa com sucesso!\n");
+                        printf("\033[1;32m Mensagem enviada para a equipa com sucesso!\033[0m\n");
                     else
-                        printf("Erro ao enviar mensagem para a equipa. Verifique permiss√µes ou exist√™ncia.\n");
+                        printf("\033[1;31m Erro ao enviar mensagem para a equipa. Verifique permissıes ou existÍncia.\033[0m\n");
                     Sleep(3000);
                 } else {
-                    printf("Voc√™ n√£o faz parte desta equipa.\n");
+                    printf("VocÍ n„o faz parte desta equipa.\n");
                     Sleep(3000);
                 }
             } else if (buscar_membro(ht, destino)) {
@@ -60,14 +55,14 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
                 printf("\nNova mensagem: ");
                 fgets(conteudo, sizeof(conteudo), stdin);
                 conteudo[strcspn(conteudo, "\n")] = 0;
-                ok = enviar_mensagem(ht, g, usuario, destino, conteudo);
+                int ok = enviar_mensagem(ht, g, usuario, destino, conteudo);
                 if (ok)
-                    printf("Mensagem enviada com sucesso!\n");
+                    printf("\033[1;32m Mensagem enviada com sucesso!\033[0m\n");
                 else
-                    printf("Erro ao enviar mensagem. Verifique se o destinat√°rio existe e est√° ativo.\n");
+                    printf("\033[1;31m Erro ao enviar mensagem. Verifique se o destinat·rio existe e est· ativo.\033[0m\n");
                 Sleep(3000);
             } else {
-                printf("Erro: destinat√°rio n√£o encontrado.\n");
+                printf("\033[1;31m Erro: destinat·rio n„o encontrado.\033[0m\n");
                 Sleep(3000);
                 continue;
             }
@@ -77,12 +72,12 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
             printf("Destino (email ou equipa): ");
             fgets(destino, sizeof(destino), stdin);
             destino[strcspn(destino, "\n")] = 0;
-            is_equipa = (buscar_equipa(eqs, destino) != NULL) ? 1 : 0;
+            int is_equipa = buscar_equipa(eqs, destino) != NULL;
             if (is_equipa || buscar_membro(ht, destino)) {
                 enviar_documento(usuario, destino);
-                printf("Documento enviado!\n");
+                printf("\033[1;32m Documento enviado!\033[0m\n");
             } else {
-                printf("Erro: destinat√°rio n√£o encontrado.\n");
+                printf("\033[1;31m Erro: destinat·rio n„o encontrado.\033[0m\n");
                 Sleep(3000);
                 getch();
             }
@@ -90,13 +85,66 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
             listar_documentos(usuario);
             printf("Pressione qualquer tecla para voltar ao menu...");
             getch();
-        } else if (opcao == 5) {
+        }else if (opcao == 5){
+        	if (m->permissao[0] == 1)
+        	{
+        		 printf("Nome da equipa: ");
+                fgets(nome_equipa, sizeof(nome_equipa), stdin);
+                nome_equipa[strcspn(nome_equipa, "\n")] = 0;
+                printf("Email do membro: ");
+                fgets(email, sizeof(email), stdin);
+                email[strcspn(email, "\n")] = 0;
+                Equipa* e = buscar_equipa(eqs, nome_equipa);
+                Membro* m = buscar_membro(ht, email);
+                if (e && m && m->ativo) {
+                    int ok = adicionar_membro_equipa(e, email);
+                    if (ok) {
+                        printf("\033[1;32m Membro adicionado com sucesso!\033[0m\n");
+                        salvar_todas_equipas(eqs);
+                    } else {
+                        printf("\033[1;31m Membro j· est· na equipa ou erro ao adicionar.\033[0m\n");
+                    }
+                } else {
+                    printf("\033[1;31m Equipa ou membro inv·lido.\033[0m\n");
+                }
+                Sleep(3000);
+			}else{
+				printf("\033[1;31m N„o possui perminssao para est· acÁ„o!\033[0m\n");
+				Sleep(3000);
+			}
+		}else if(opcao == 6){
+			if(m->permissao[1] == 1)
+			{
+				 printf("Nome da equipa: ");
+                fgets(nome_equipa, sizeof(nome_equipa), stdin);
+                nome_equipa[strcspn(nome_equipa, "\n")] = 0;
+                printf("Email do membro: ");
+                fgets(email, sizeof(email), stdin);
+                email[strcspn(email, "\n")] = 0;
+                Equipa* e = buscar_equipa(eqs, nome_equipa);
+                if (e) {
+                    int ok = remover_membro_equipa(e, email);
+                    if (ok) {
+                        salvar_todas_equipas(eqs);
+                        printf("\033[1;32m Membro removido com sucesso!\033[0m\n");
+                    } else {
+                        printf("\033[1;31m Membro n„o encontrado na equipa ou erro ao remover.\033[0m\n");
+                    }
+                } else {
+                    printf("\033[1;31m Equipa n„o encontrada.\033[0m\n");
+                }
+			}else
+			{
+				printf("\033[1;31m Nao possui permissao para esta accao\033[0m\n");
+			}
+			 Sleep(3000);
+		}else if (opcao == 7) {
             printf("\n--- Meu Perfil ---\n");
             printf("Email: %s\n", m->email);
             printf("Tipo: %s\n", m->tipo == 0 ? "ADMIN" : (m->tipo == 1 ? "CORPORATIVO" : "CONVIDADO"));
             printf("Equipas: ");
-            encontrou = 0;
-            eq = eqs->lista;
+            int encontrou = 0;
+            Equipa* eq = eqs->lista;
             while (eq) {
                 MembroEquipa* me = eq->membros;
                 while (me) {
@@ -118,7 +166,7 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
         } else if (opcao == 0) {
             printf("Voltando ao menu principal...\n");
         } else if (opcao != 0) {
-            printf("Op√ß√£o inv√°lida.\n");
+            printf("OpÁ„o inv·lida.\n");
             Sleep(3000);
         }
     } while (opcao != 0);

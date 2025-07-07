@@ -11,9 +11,9 @@ Membro* criar_membro(const char* email, const char* senha, TipoMembro tipo, int 
     strcpy(novo->senha, senha);
     novo->tipo = tipo;
     novo->ativo = 1;
-    novo->permissao[0] = 1;
-    novo->permissao[1] = 1;
-    novo->permissao[2] = 1;
+    novo->permissao[0] = 0;
+    novo->permissao[1] = 0;
+    novo->permissao[2] = 0;
     novo->documentos = NULL;
     novo->prox = NULL;
     return novo;
