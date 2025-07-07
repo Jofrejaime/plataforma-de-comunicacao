@@ -1,19 +1,21 @@
-#include "hash.h"
+#include "../include/hash.h"
 
 // Calcula o índice de hash para um email. Retorna 0 se email for NULL.
 int hash(const char* email) {
+	int i;
     if (!email) return 0;
     int soma = 0;
-    for (int i = 0; email[i] != '\0'; i++)
+    for (i = 0; email[i] != '\0'; i++)
         soma += email[i];
     return soma % TAM_HASH;
 }
 
 // Cria uma nova tabela hash. Retorna NULL em caso de erro de alocação.
 HashTable* criar_hash() {
+	int i;
     HashTable* ht = (HashTable*)malloc(sizeof(HashTable));
     if (!ht) return NULL;
-    for (int i = 0; i < TAM_HASH; i++)
+    for (i = 0; i < TAM_HASH; i++)
         ht->tabela[i] = NULL;
     return ht;
 }
@@ -63,8 +65,9 @@ int remover_membro(HashTable* ht, const char* email) {
 
 // Libera toda a tabela hash e seus membros.
 void desalocar_hash(HashTable* ht) {
+	int i;
     if (!ht) return;
-    for (int i = 0; i < TAM_HASH; i++) {
+    for (i = 0; i < TAM_HASH; i++) {
         Membro* atual = ht->tabela[i];
         while (atual) {
             Membro* prox = atual->prox;

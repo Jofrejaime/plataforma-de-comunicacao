@@ -1,0 +1,52 @@
+# Project: palataformaDeComunicacao
+# Makefile created by Dev-C++ 5.11
+
+CPP      = g++.exe
+CC       = gcc.exe
+WINDRES  = windres.exe
+OBJ      = src/app.o src/documento.o src/equipa.o src/grafo.o src/grupo.o src/hash.o src/main.o src/membro.o src/menu.o
+LINKOBJ  = src/app.o src/documento.o src/equipa.o src/grafo.o src/grupo.o src/hash.o src/main.o src/membro.o src/menu.o
+LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib" -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib" -static-libgcc
+INCS     = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include"
+CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include/c++"
+BIN      = plataformaDeComunicacao.exe
+CXXFLAGS = $(CXXINCS) 
+CFLAGS   = $(INCS) 
+RM       = rm.exe -f
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before $(BIN) all-after
+
+clean: clean-custom
+	${RM} $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CC) $(LINKOBJ) -o $(BIN) $(LIBS)
+
+src/app.o: src/app.c
+	$(CC) -c src/app.c -o src/app.o $(CFLAGS)
+
+src/documento.o: src/documento.c
+	$(CC) -c src/documento.c -o src/documento.o $(CFLAGS)
+
+src/equipa.o: src/equipa.c
+	$(CC) -c src/equipa.c -o src/equipa.o $(CFLAGS)
+
+src/grafo.o: src/grafo.c
+	$(CC) -c src/grafo.c -o src/grafo.o $(CFLAGS)
+
+src/grupo.o: src/grupo.c
+	$(CC) -c src/grupo.c -o src/grupo.o $(CFLAGS)
+
+src/hash.o: src/hash.c
+	$(CC) -c src/hash.c -o src/hash.o $(CFLAGS)
+
+src/main.o: src/main.c
+	$(CC) -c src/main.c -o src/main.o $(CFLAGS)
+
+src/membro.o: src/membro.c
+	$(CC) -c src/membro.c -o src/membro.o $(CFLAGS)
+
+src/menu.o: src/menu.c
+	$(CC) -c src/menu.c -o src/menu.o $(CFLAGS)

@@ -1,6 +1,6 @@
-#include "membro.h"
-#include "hash.h"
-#include "app.h"
+#include "../include/membro.h"
+#include "../include/hash.h"
+#include "../include/app.h"
 
 // Cria um novo membro. Retorna NULL em caso de erro de alocação.
 Membro* criar_membro(const char* email, const char* senha, TipoMembro tipo, int salvar) {
@@ -27,10 +27,11 @@ void imprimir_membro(Membro* membro) {
         printf("Membro não encontrado.\n");
         return;
     }
+    int i;
     printf("Email: %s\n", membro->email);
     printf("Tipo: %s\n", tipo_str[membro->tipo]);
     printf("\tPermissões:\n");
-    for (int i = 0; i < 3; i++)
+    for (i = 0; i < 3; i++)
         printf("\t%s: %s\n", permissoes[i], membro->permissao[i] ? "Ativo" : "Desativado");
     printf("Ativo: %s\n", membro->ativo ? "Sim" : "Não");
 }

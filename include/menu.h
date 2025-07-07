@@ -1,12 +1,12 @@
 #ifndef MENU_H
 #define MENU_H
 
-#include "grafo.h"
-#include "equipa.h"
-#include "membro.h"
-#include "hash.h"
-#include "app.h"
-#include "documento.h"
+#include "../include/grafo.h"
+#include "../include/equipa.h"
+#include "../include/membro.h"
+#include "../include/hash.h"
+#include "../include/app.h"
+#include "../include/documento.h"
 #include <conio.h>
 #include <windows.h>
 

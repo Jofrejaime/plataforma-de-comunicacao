@@ -1,4 +1,4 @@
-#include "menu.h"
+#include "../include/menu.h"
 
 void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* eqs) {
     int opcao;
@@ -12,7 +12,15 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
         "0. Sair",
         NULL
     };
-    Membro* m = buscar_membro(ht, usuario);
+    Membro* m;
+    Equipa* eq;
+    int membro;
+    MembroEquipa* me;
+    int ok;
+    bool is_equipa;
+    int encontrou;
+    
+    m = buscar_membro(ht, usuario);
     do {
         printf("\n--- Plataforma (%s) ---\n", usuario);
         opcao = menu_iterativo(opcs);
@@ -20,11 +28,11 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
             printf("Destino (email ou equipa): ");
             fgets(destino, sizeof(destino), stdin);
             destino[strcspn(destino, "\n")] = 0;
-            Equipa* eq = buscar_equipa(eqs, destino);
+            eq = buscar_equipa(eqs, destino);
             if (eq) {
-                // Verifica se o usuário faz parte da equipa
-                int membro = 0;
-                MembroEquipa* me = eq->membros;
+                /* Verifica se o usuário faz parte da equipa */
+                membro = 0;
+                me = eq->membros;
                 while (me) {
                     if (strcmp(me->email, usuario) == 0) {
                         membro = 1;
@@ -37,7 +45,7 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
                     printf("\nNova mensagem para equipa: ");
                     fgets(conteudo, sizeof(conteudo), stdin);
                     conteudo[strcspn(conteudo, "\n")] = 0;
-                    int ok = enviar_mensagem_para_equipa(ht, g, eqs, usuario, destino, conteudo);
+                    ok = enviar_mensagem_para_equipa(ht, g, eqs, usuario, destino, conteudo);
                     if (ok)
                         printf("Mensagem enviada para a equipa com sucesso!\n");
                     else
@@ -52,7 +60,7 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
                 printf("\nNova mensagem: ");
                 fgets(conteudo, sizeof(conteudo), stdin);
                 conteudo[strcspn(conteudo, "\n")] = 0;
-                int ok = enviar_mensagem(ht, g, usuario, destino, conteudo);
+                ok = enviar_mensagem(ht, g, usuario, destino, conteudo);
                 if (ok)
                     printf("Mensagem enviada com sucesso!\n");
                 else
@@ -69,7 +77,7 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
             printf("Destino (email ou equipa): ");
             fgets(destino, sizeof(destino), stdin);
             destino[strcspn(destino, "\n")] = 0;
-            bool is_equipa = buscar_equipa(eqs, destino) != NULL;
+            is_equipa = (buscar_equipa(eqs, destino) != NULL);
             if (is_equipa || buscar_membro(ht, destino)) {
                 enviar_documento(usuario, destino);
                 printf("Documento enviado!\n");
@@ -87,8 +95,8 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
             printf("Email: %s\n", m->email);
             printf("Tipo: %s\n", m->tipo == 0 ? "ADMIN" : (m->tipo == 1 ? "CORPORATIVO" : "CONVIDADO"));
             printf("Equipas: ");
-            int encontrou = 0;
-            Equipa* eq = eqs->lista;
+            encontrou = 0;
+            eq = eqs->lista;
             while (eq) {
                 MembroEquipa* me = eq->membros;
                 while (me) {
@@ -324,10 +332,10 @@ int	menu_iterativo(char **opcs)
 {
     int select = 0,  teclas;
     int size = ft_strlen(opcs);
-    
+    int i;
     while (1){
         system("cls");
-        for (int i = 0; i < size; i++){
+        for (i = 0; i < size; i++){
             if (i == select) printf(">> \033[1;36m %s \033[0m\n", opcs[i]);
             else printf(" %s\n", opcs[i]);
         }

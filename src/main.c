@@ -1,29 +1,34 @@
-#include "menu.h"
-#include "hash.h"
-#include "grafo.h"
-#include "equipa.h"
-#include "app.h"
+#include "../include/menu.h"
+#include "../include/hash.h"
+#include "../include/grafo.h"
+#include "../include/equipa.h"
+#include "../include/app.h"
 #include <locale.h>
 
 int main() {
+    HashTable* ht;
+    Grafo* g;
+    ListaEquipas* eqs;
+    int opcao = 0;
+    
     setlocale(LC_ALL, "pt_PT.UTF-8");
     verificar_ou_criar_pasta("data");
     verificar_ou_criar_pasta("mensagens");
     verificar_ou_criar_pasta("documentos");
 
-    // Alocação das estruturas principais com verificação de erro
-    HashTable* ht = criar_hash();
+    /* Alocação das estruturas principais com verificação de erro */
+    ht = criar_hash();
     if (!ht) {
         fprintf(stderr, "Erro ao alocar tabela hash. Encerrando.\n");
         return 1;
     }
-    Grafo* g = criar_grafo();
+    g = criar_grafo();
     if (!g) {
         fprintf(stderr, "Erro ao alocar grafo. Encerrando.\n");
         desalocar_hash(ht);
         return 1;
     }
-    ListaEquipas* eqs = criar_lista_equipas();
+    eqs = criar_lista_equipas();
     if (!eqs) {
         fprintf(stderr, "Erro ao alocar lista de equipas. Encerrando.\n");
         desalocar_hash(ht);
@@ -34,7 +39,6 @@ int main() {
     carregar_mensagens_para_grafo(g, "mensagens");
     carregar_membros(ht);
     carregar_equipas(eqs);
-    int opcao =  0;
 
     do {
         opcao = mostrar_menu_principal();

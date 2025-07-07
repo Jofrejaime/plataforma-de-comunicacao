@@ -1,4 +1,4 @@
-#include "equipa.h"
+#include "../include/equipa.h"
 
 // Cria uma nova lista de equipas. Retorna NULL em caso de erro de alocação.
 ListaEquipas* criar_lista_equipas() {

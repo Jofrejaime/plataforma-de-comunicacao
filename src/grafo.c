@@ -1,5 +1,5 @@
-#include "grafo.h"
-#include "app.h"
+#include "../include/grafo.h"
+#include "../include/app.h"
 
 // Cria e inicializa um novo grafo. Retorna NULL em caso de erro de alocação.
 Grafo* criar_grafo() {

@@ -1,17 +1,22 @@
 #ifndef APP_H
 #define APP_H
 
-#include <stdbool.h>
+/* #include <stdbool.h> - Removido para C89 */
+#ifndef bool
+#define bool int
+#define true 1
+#define false 0
+#endif
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 #include <windows.h>
 #include <conio.h>
-#include "hash.h"
-#include "grafo.h"
-#include "menu.h"
-#include "equipa.h"
-#include "membro.h"
+#include "../include/hash.h"
+#include "../include/grafo.h"
+#include "../include/menu.h"
+#include "../include/equipa.h"
+#include "../include/membro.h"
 
 #ifdef _WIN32
 #include <direct.h>

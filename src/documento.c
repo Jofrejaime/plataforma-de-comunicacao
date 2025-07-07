@@ -1,5 +1,5 @@
-#include "documento.h"
-#include "membro.h"
+#include "../include/documento.h"
+#include "../include/membro.h"
 
 void registrar_documento(const char* email, const char* tipo, const char* participante, const char* data, const char* nome_arquivo) {
     if (!email || !tipo || !participante || !data || !nome_arquivo) return;
