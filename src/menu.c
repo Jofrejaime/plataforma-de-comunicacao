@@ -396,7 +396,11 @@ void menu_admin(HashTable* ht, ListaEquipas* eqs) {
                     nome_equipa[strcspn(nome_equipa, "\n")] = 0;
                     /* Admin sempre pode enviar para qualquer equipa */
                     if (strlen(nome_equipa) > 0) {
-                        mensagem_sucesso("Mensagem enviada para a equipa com sucesso!");
+                        if (registrar_comunicacao(NULL, "admin", email, nome_equipa)) {
+                            mensagem_sucesso("Mensagem enviada para a equipa com sucesso!");
+                        } else {
+                            mensagem_erro("Falha ao salvar mensagem!");
+                        }
                     } else {
                         mensagem_erro("Mensagem vazia nao foi enviada!");
                     }
@@ -409,7 +413,11 @@ void menu_admin(HashTable* ht, ListaEquipas* eqs) {
                     fgets(nome_equipa, sizeof(nome_equipa), stdin);
                     nome_equipa[strcspn(nome_equipa, "\n")] = 0;
                     if (strlen(nome_equipa) > 0) {
-                        mensagem_sucesso("Mensagem enviada com sucesso!");
+                        if (registrar_comunicacao(NULL, "admin", email, nome_equipa)) {
+                            mensagem_sucesso("Mensagem enviada com sucesso!");
+                        } else {
+                            mensagem_erro("Falha ao salvar mensagem!");
+                        }
                     } else {
                         mensagem_erro("Mensagem vazia nao foi enviada!");
                     }
