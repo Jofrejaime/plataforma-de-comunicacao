@@ -4,8 +4,8 @@
 CPP      = g++.exe
 CC       = gcc.exe
 WINDRES  = windres.exe
-OBJ      = src/app.o src/documento.o src/equipa.o src/grafo.o src/grupo.o src/hash.o src/main.o src/membro.o src/menu.o
-LINKOBJ  = src/app.o src/documento.o src/equipa.o src/grafo.o src/grupo.o src/hash.o src/main.o src/membro.o src/menu.o
+OBJ      = src/app.o src/documento.o src/equipa.o src/grafo.o src/hash.o src/main.o src/membro.o src/menu.o
+LINKOBJ  = src/app.o src/documento.o src/equipa.o src/grafo.o src/hash.o src/main.o src/membro.o src/menu.o
 LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib" -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib" -static-libgcc
 INCS     = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include"
 CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include/c++"
@@ -35,9 +35,6 @@ src/equipa.o: src/equipa.c
 
 src/grafo.o: src/grafo.c
 	$(CC) -c src/grafo.c -o src/grafo.o $(CFLAGS)
-
-src/grupo.o: src/grupo.c
-	$(CC) -c src/grupo.c -o src/grupo.o $(CFLAGS)
 
 src/hash.o: src/hash.c
 	$(CC) -c src/hash.c -o src/hash.o $(CFLAGS)
