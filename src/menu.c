@@ -532,14 +532,17 @@ void menu_convidado(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
     int opcao;
     char titulo[100];
     char *opcs[] = {
-        "1. Ver minhas equipas",
-        "2. Visualizar meu perfil",
+        "1. Enviar mensagem",
+        "2. Ver minhas equipas",
+        "3. Visualizar meu perfil",
         "0. Sair",
         NULL
     };
     Membro* m;
     Equipa* eq;
-    int encontrou;
+    int encontrou, membro, ok;
+    char destino[100], conteudo[256];
+    MembroEquipa* membro_equipa;
     
     (void)g; /* Suprime warning de parametro nao usado */
     
@@ -550,8 +553,59 @@ void menu_convidado(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
         opcao = menu_iterativo(opcs);
         
         if (opcao == 1) {
-            menu_equipas_membro(usuario, m->tipo, eqs);
+            imprimir_cabecalho("ENVIAR MENSAGEM");
+            printf("Digite o destinatario (email ou nome da equipa):\n> ");
+            fgets(destino, sizeof(destino), stdin);
+            destino[strcspn(destino, "\n")] = 0;
+            
+            eq = buscar_equipa(eqs, destino);
+            if (eq) {
+                /* Verifica se convidado faz parte da equipa */
+                membro = 0;
+                membro_equipa = eq->membros;
+                while (membro_equipa) {
+                    if (strcmp(membro_equipa->email, usuario) == 0) {
+                        membro = 1;
+                        break;
+                    }
+                    membro_equipa = membro_equipa->prox;
+                }
+                
+                if (membro) {
+                    printf("\nHistorico de mensagens da equipa '%s':\n", destino);
+                    imprimir_separador();
+                    listar_mensagens_comuns(usuario, destino, 1);
+                    imprimir_separador();
+                    printf("Digite sua mensagem para a equipa:\n> ");
+                    fgets(conteudo, sizeof(conteudo), stdin);
+                    conteudo[strcspn(conteudo, "\n")] = 0;
+                    ok = enviar_mensagem_para_equipa(ht, g, eqs, usuario, destino, conteudo);
+                    if (ok)
+                        mensagem_sucesso("Mensagem enviada para a equipa com sucesso!");
+                    else
+                        mensagem_erro("Falha ao enviar mensagem.");
+                } else {
+                    mensagem_erro("Acesso negado! Voce nao e membro desta equipa.");
+                }
+            } else if (buscar_membro(ht, destino)) {
+                printf("\nConversa com '%s':\n", destino);
+                imprimir_separador();
+                listar_mensagens_comuns(usuario, destino, 0);
+                imprimir_separador();
+                printf("Digite sua mensagem:\n> ");
+                fgets(conteudo, sizeof(conteudo), stdin);
+                conteudo[strcspn(conteudo, "\n")] = 0;
+                ok = enviar_mensagem(ht, g, usuario, destino, conteudo);
+                if (ok)
+                    mensagem_sucesso("Mensagem enviada com sucesso!");
+                else
+                    mensagem_erro("Falha ao enviar. Destinatario inativo ou voce foi bloqueado.");
+            } else {
+                mensagem_erro("Destinatario nao encontrado!");
+            }
         } else if (opcao == 2) {
+            menu_equipas_membro(usuario, m->tipo, eqs);
+        } else if (opcao == 3) {
             imprimir_cabecalho("MEU PERFIL");
             printf("Email: %s\n", m->email);
             printf("Tipo: CONVIDADO\n");
