@@ -3,7 +3,7 @@
 
 #include "membro.h"
 #include <stdio.h>
-#include <stdbool.h>
+/* #include <stdbool.h> - Removido para C89 */
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>

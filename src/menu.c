@@ -17,7 +17,7 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
     int membro;
     MembroEquipa* me;
     int ok;
-    bool is_equipa;
+    int is_equipa;
     int encontrou;
     
     m = buscar_membro(ht, usuario);
@@ -41,7 +41,7 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
                     me = me->prox;
                 }
                 if (membro) {
-                    listar_mensagens_comuns(usuario, destino, true);
+                    listar_mensagens_comuns(usuario, destino, 1);
                     printf("\nNova mensagem para equipa: ");
                     fgets(conteudo, sizeof(conteudo), stdin);
                     conteudo[strcspn(conteudo, "\n")] = 0;
@@ -56,7 +56,7 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
                     Sleep(3000);
                 }
             } else if (buscar_membro(ht, destino)) {
-                listar_mensagens_comuns(usuario, destino, false);
+                listar_mensagens_comuns(usuario, destino, 0);
                 printf("\nNova mensagem: ");
                 fgets(conteudo, sizeof(conteudo), stdin);
                 conteudo[strcspn(conteudo, "\n")] = 0;
@@ -77,7 +77,7 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
             printf("Destino (email ou equipa): ");
             fgets(destino, sizeof(destino), stdin);
             destino[strcspn(destino, "\n")] = 0;
-            is_equipa = (buscar_equipa(eqs, destino) != NULL);
+            is_equipa = (buscar_equipa(eqs, destino) != NULL) ? 1 : 0;
             if (is_equipa || buscar_membro(ht, destino)) {
                 enviar_documento(usuario, destino);
                 printf("Documento enviado!\n");

@@ -1,16 +1,9 @@
 #include "../include/app.h"
 #include "../include/documento.h"
 
-/* Definição de bool para C89 */
-#ifndef bool
-#define bool int
-#define true 1
-#define false 0
-#endif
-
 // --- Funções de registro e login ---
 // Registra um novo membro. Retorna 1 em caso de sucesso, 0 em caso de erro.
-bool registrar(HashTable* ht, const char* email, const char* senha, TipoMembro tipo) {
+int registrar(HashTable* ht, const char* email, const char* senha, TipoMembro tipo) {
     Membro* novo;
     if (!ht || !email || !senha || !strchr(email, '@')) return 0;
     if (buscar_membro(ht, email)) return 0;
@@ -21,7 +14,7 @@ bool registrar(HashTable* ht, const char* email, const char* senha, TipoMembro t
 }
 
 // Realiza login de um membro. Retorna 1 em caso de sucesso, 0 em caso de erro.
-bool login(HashTable* ht, Grafo* g, ListaEquipas* eqs, char* email, char* senha) {
+int login(HashTable* ht, Grafo* g, ListaEquipas* eqs, char* email, char* senha) {
     Membro* m;
     if (!ht || !email || !senha) return 0;
     m = buscar_membro(ht, email);
@@ -38,7 +31,7 @@ bool login(HashTable* ht, Grafo* g, ListaEquipas* eqs, char* email, char* senha)
 
 // --- Funções de mensagens ---
 // Lista mensagens comuns entre dois usuários (apenas exibe)
-void listar_mensagens_comuns(const char* usuario, const char* outro, bool destino_e_equipa) {
+void listar_mensagens_comuns(const char* usuario, const char* outro, int destino_e_equipa) {
     char path[150];
     FILE* f;
     char linha[512];
@@ -108,7 +101,7 @@ void listar_mensagens_comuns(const char* usuario, const char* outro, bool destin
 }
 
 // Envia mensagem entre membros. Retorna 1 em caso de sucesso, 0 em caso de erro.
-bool enviar_mensagem(HashTable* ht, Grafo* g, const char* origem, const char* destino, const char* conteudo) {
+int enviar_mensagem(HashTable* ht, Grafo* g, const char* origem, const char* destino, const char* conteudo) {
     Membro* remetente;
     Membro* receptor;
     if (!ht || !g || !origem || !destino || !conteudo) return 0;
@@ -121,7 +114,7 @@ bool enviar_mensagem(HashTable* ht, Grafo* g, const char* origem, const char* de
 }
 
 // Envia mensagem para uma equipa. Retorna 1 em caso de sucesso, 0 em caso de erro.
-bool enviar_mensagem_para_equipa(HashTable* ht, Grafo* g, ListaEquipas* eqs, const char* origem, const char* nome_equipa, const char* conteudo) {
+int enviar_mensagem_para_equipa(HashTable* ht, Grafo* g, ListaEquipas* eqs, const char* origem, const char* nome_equipa, const char* conteudo) {
     Equipa* e;
     Membro* m;
     int permitido = 0;

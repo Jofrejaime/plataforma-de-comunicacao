@@ -1,0 +1,35 @@
+# Makefile para DEV-C++ - Compatibilidade C89
+CC = gcc
+CFLAGS = -std=c89 -Wall -Wextra -pedantic -Iinclude
+LDFLAGS = 
+TARGET = plataforma
+SRCDIR = src
+INCDIR = include
+OBJDIR = obj
+
+# Lista de arquivos fonte
+SOURCES = $(wildcard $(SRCDIR)/*.c)
+OBJECTS = $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
+
+# Regra principal
+all: $(TARGET)
+
+# Criação do executável
+$(TARGET): $(OBJECTS)
+	$(CC) $(OBJECTS) -o $(TARGET) $(LDFLAGS)
+
+# Compilação dos objetos
+$(OBJDIR)/%.o: $(SRCDIR)/%.c
+	@if not exist $(OBJDIR) mkdir $(OBJDIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Limpeza
+clean:
+	@if exist $(OBJDIR) rmdir /s /q $(OBJDIR)
+	@if exist $(TARGET).exe del $(TARGET).exe
+
+# Executar
+run: $(TARGET)
+	./$(TARGET)
+
+.PHONY: all clean run

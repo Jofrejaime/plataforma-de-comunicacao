@@ -1,12 +1,7 @@
 #ifndef APP_H
 #define APP_H
 
-/* #include <stdbool.h> - Removido para C89 */
-#ifndef bool
-#define bool int
-#define true 1
-#define false 0
-#endif
+/* Removido stdbool.h para compatibilidade C89 */
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
@@ -29,17 +24,17 @@
 
 // --- Autenticação ---
 // Realiza login de um membro. Retorna 1 em caso de sucesso, 0 em caso de erro.
-bool login(HashTable* ht, Grafo* g, ListaEquipas* eqs, char* email, char* senha);
+int login(HashTable* ht, Grafo* g, ListaEquipas* eqs, char* email, char* senha);
 // Registra um novo membro. Retorna 1 em caso de sucesso, 0 em caso de erro.
-bool registrar(HashTable* ht, const char* email, const char* senha, TipoMembro tipo);
+int registrar(HashTable* ht, const char* email, const char* senha, TipoMembro tipo);
 
 // --- Mensagens ---
 // Envia mensagem entre membros. Retorna 1 em caso de sucesso, 0 em caso de erro.
-bool enviar_mensagem(HashTable* ht, Grafo* g, const char* origem, const char* destino, const char* conteudo);
+int enviar_mensagem(HashTable* ht, Grafo* g, const char* origem, const char* destino, const char* conteudo);
 // Envia mensagem para uma equipa. Retorna 1 em caso de sucesso, 0 em caso de erro.
-bool enviar_mensagem_para_equipa(HashTable* ht, Grafo* g, ListaEquipas* eqs, const char* origem, const char* nome_equipa, const char* conteudo);
+int enviar_mensagem_para_equipa(HashTable* ht, Grafo* g, ListaEquipas* eqs, const char* origem, const char* nome_equipa, const char* conteudo);
 // Lista mensagens comuns entre dois usuários
-void listar_mensagens_comuns(const char* usuario, const char* outro, bool destino_e_equipa);
+void listar_mensagens_comuns(const char* usuario, const char* outro, int destino_e_equipa);
 
 // --- Membros ---
 // Carrega membros do ficheiro
