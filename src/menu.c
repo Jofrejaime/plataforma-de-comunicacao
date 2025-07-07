@@ -35,15 +35,15 @@ void mensagem_info(const char* msg) {
 void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* eqs) {
     int opcao;
     char destino[100], conteudo[256];
+    char nome_equipa[100], email[100];
     char titulo[100];
     char *opcs[] = {
         "1. Enviar mensagem",
         "2. Ver equipas",
         "3. Enviar documento",
         "4. Convidar membro",
-        "6. Listar meus documentos",
-        "7. Visualizar meu perfil",
-        "9. Bloquear/Desbloquear membro",
+        "5. Listar meus documentos",
+        "6. Visualizar meu perfil",
         "0. Sair",
         NULL
     };
@@ -175,7 +175,7 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
             imprimir_separador();
             printf("Pressione qualquer tecla para voltar ao menu...");
             getch();
-        } else if (opcao == 7) {
+        } else if (opcao == 6) {
             imprimir_cabecalho("MEU PERFIL");
             printf("Email: %s\n", m->email);
             printf("Tipo: %s\n", m->tipo == 0 ? "ADMINISTRADOR" : (m->tipo == 1 ? "CORPORATIVO" : "CONVIDADO"));
