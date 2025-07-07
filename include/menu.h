@@ -22,6 +22,8 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
 void menu_admin(HashTable* ht, ListaEquipas* eqs);
 // Menu para equipas de um membro: exibe mensagens apropriadas ao usuário
 void menu_equipas_membro(const char* email, TipoMembro tipo, ListaEquipas* eqs);
+// Menu especifico para membros convidados
+void menu_convidado(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* eqs);
 // Menu iterativo para seleção de opções, retorna índice da opção escolhida
 int menu_iterativo(char **opcs);
 

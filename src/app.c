@@ -21,6 +21,8 @@ int login(HashTable* ht, Grafo* g, ListaEquipas* eqs, char* email, char* senha) 
     if (m && strcmp(m->senha, senha) == 0 && m->ativo) {
         if (m->tipo == ADMIN) {
             menu_admin(ht, eqs);
+        } else if (m->tipo == CONVIDADO) {
+            menu_convidado(ht, g, email, eqs);
         } else {
             menu_mensagens(ht, g, email, eqs);
         }
@@ -196,11 +198,15 @@ void actualizar_permissao(HashTable *ht, const char *email) {
     Membro *m = buscar_membro(ht, email);
     if (!m) return;
     select = menu_iterativo(permissoes);
+    select -= 1;
     if (m->permissao[select] == 0) {
         m->permissao[select] = 1;
+        printf("\033[1;32m permins�o alterada com sucesso ja pode executar!\033[0m\n");
     } else if (m->permissao[select] == 1) {
         m->permissao[select] = 0;
+        printf("\033[1;32m permins�o alterada com sucesso ja nao pode executar!\033[0m\n");
     }
+    Sleep(3000);
 }
 
 // --- Utilitários ---
