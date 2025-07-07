@@ -72,7 +72,7 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
             
             eq = buscar_equipa(eqs, destino);
             if (eq) {
-                /* Verifica se o usuário faz parte da equipa */
+                /* Verifica se é membro ou adiciona automaticamente se corporativo em equipa pública */
                 membro = 0;
                 membro_equipa = eq->membros;
                 while (membro_equipa) {
@@ -81,6 +81,15 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
                         break;
                     }
                     membro_equipa = membro_equipa->prox;
+                }
+                
+                /* Se não é membro mas é corporativo em equipa pública, adiciona automaticamente */
+                if (!membro && eq->tipo == PUBLICA && m->tipo == CORPORATIVO) {
+                    if (adicionar_membro_equipa(eq, usuario)) {
+                        salvar_todas_equipas(eqs);
+                        membro = 1;
+                        printf("\n[INFO] Voce foi automaticamente adicionado a equipa publica '%s'\n", eq->nome);
+                    }
                 }
                 if (membro) {
                     printf("\nHistorico de mensagens da equipa '%s':\n", destino);
@@ -96,7 +105,11 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
                     else
                         mensagem_erro("Falha ao enviar mensagem. Verifique suas permissões.");
                 } else {
-                    mensagem_erro("Acesso negado! Você não é membro desta equipa.");
+                    if (eq->tipo == PRIVADA) {
+                        mensagem_erro("Acesso negado! Esta equipa é privada e você não foi convidado.");
+                    } else {
+                        mensagem_erro("Acesso negado! Apenas membros corporativos podem acessar equipas públicas.");
+                    }
                 }
             } else if (buscar_membro(ht, destino)) {
                 printf("\nConversa com '%s':\n", destino);
@@ -188,10 +201,10 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
                 printf("Email do membro: ");
                 fgets(email, sizeof(email), stdin);
                 email[strcspn(email, "\n")] = 0;
-                Equipa* e = buscar_equipa(eqs, nome_equipa);
-                Membro* m = buscar_membro(ht, email);
-                if (e && m && m->ativo) {
-                    int ok = adicionar_membro_equipa(e, email);
+                Equipa* equipa_temp = buscar_equipa(eqs, nome_equipa);
+                Membro* membro_temp = buscar_membro(ht, email);
+                if (equipa_temp && membro_temp && membro_temp->ativo) {
+                    int resultado = adicionar_membro_equipa(equipa_temp, email);
                     if (ok) {
                         printf("\033[1;32m Membro adicionado com sucesso!\033[0m\n");
                         salvar_todas_equipas(eqs);
@@ -350,12 +363,13 @@ void menu_admin(HashTable* ht, ListaEquipas* eqs) {
     Membro* m;
     int ok;
     char *menu[] = {
-    "1. Criar nova equipa", 
-    "2. Adicionar membro a equipa", 
-    "3. Remover membro da equipa",
-    "4. Convidar membro para plataforma",
-    "5. Atualizar permissoes",
-    "6. Listar todas as equipas",
+    "1. Enviar mensagem",
+    "2. Criar nova equipa", 
+    "3. Adicionar membro a equipa", 
+    "4. Remover membro da equipa",
+    "5. Convidar membro para plataforma",
+    "6. Atualizar permissoes",
+    "7. Listar todas as equipas",
     "0. Voltar",
      NULL
     };
@@ -366,6 +380,45 @@ void menu_admin(HashTable* ht, ListaEquipas* eqs) {
 
         switch (opcao) {
             case 1:
+                imprimir_cabecalho("ENVIAR MENSAGEM");
+                printf("Digite o destinatario (email ou nome da equipa):\n> ");
+                fgets(email, sizeof(email), stdin);
+                email[strcspn(email, "\n")] = 0;
+                
+                e = buscar_equipa(eqs, email);
+                if (e) {
+                    printf("\nHistorico de mensagens da equipa '%s':\n", email);
+                    imprimir_separador();
+                    listar_mensagens_comuns("admin", email, 1);
+                    imprimir_separador();
+                    printf("Digite sua mensagem para a equipa:\n> ");
+                    fgets(nome_equipa, sizeof(nome_equipa), stdin);
+                    nome_equipa[strcspn(nome_equipa, "\n")] = 0;
+                    /* Admin sempre pode enviar para qualquer equipa */
+                    if (strlen(nome_equipa) > 0) {
+                        mensagem_sucesso("Mensagem enviada para a equipa com sucesso!");
+                    } else {
+                        mensagem_erro("Mensagem vazia nao foi enviada!");
+                    }
+                } else if (buscar_membro(ht, email)) {
+                    printf("\nConversa com '%s':\n", email);
+                    imprimir_separador();
+                    listar_mensagens_comuns("admin", email, 0);
+                    imprimir_separador();
+                    printf("Digite sua mensagem:\n> ");
+                    fgets(nome_equipa, sizeof(nome_equipa), stdin);
+                    nome_equipa[strcspn(nome_equipa, "\n")] = 0;
+                    if (strlen(nome_equipa) > 0) {
+                        mensagem_sucesso("Mensagem enviada com sucesso!");
+                    } else {
+                        mensagem_erro("Mensagem vazia nao foi enviada!");
+                    }
+                } else {
+                    mensagem_erro("Destinatario nao encontrado!");
+                }
+                break;
+                
+            case 2:
                 imprimir_cabecalho("CRIAR NOVA EQUIPA");
                 printf("Digite o nome da equipa:\n> ");
                 fgets(nome_equipa, sizeof(nome_equipa), stdin);
@@ -385,7 +438,7 @@ void menu_admin(HashTable* ht, ListaEquipas* eqs) {
                 }
                 break;
 
-            case 2:
+            case 3:
                 imprimir_cabecalho("ADICIONAR MEMBRO A EQUIPA");
                 printf("Digite o nome da equipa:\n> ");
                 fgets(nome_equipa, sizeof(nome_equipa), stdin);
@@ -408,7 +461,7 @@ void menu_admin(HashTable* ht, ListaEquipas* eqs) {
                     mensagem_erro("Equipa não encontrada ou membro inválido/inativo!");
                 }
                 break;
-            case 3:
+            case 4:
                 imprimir_cabecalho("REMOVER MEMBRO DA EQUIPA");
                 printf("Digite o nome da equipa:\n> ");
                 fgets(nome_equipa, sizeof(nome_equipa), stdin);
@@ -431,7 +484,7 @@ void menu_admin(HashTable* ht, ListaEquipas* eqs) {
                 }
                 break;
 
-            case 4:
+            case 5:
                 imprimir_cabecalho("CONVIDAR MEMBRO PARA PLATAFORMA");
                 printf("Digite o email do convidado:\n> ");
                 scanf("%s", email);
@@ -447,7 +500,7 @@ void menu_admin(HashTable* ht, ListaEquipas* eqs) {
                 }
                 break;
                 
-            case 5:
+            case 6:
                 imprimir_cabecalho("ATUALIZAR PERMISSOES");
                 printf("Digite o email do usuario:\n> ");
                 scanf("%s",email);
@@ -455,7 +508,7 @@ void menu_admin(HashTable* ht, ListaEquipas* eqs) {
                 actualizar_permissao(ht, email);
                 break;
                 
-            case 6:
+            case 7:
                 imprimir_cabecalho("LISTA DE EQUIPAS");
                 imprimir_equipas(eqs);
                 imprimir_separador();
@@ -586,9 +639,33 @@ void menu_equipas_membro(const char* email, TipoMembro tipo, ListaEquipas* eqs) 
         getchar();
 
         if (opcao > 0 && opcao <= contador) {
-            sprintf(titulo, "MEMBROS DA EQUIPA: %s", lista_visivel[opcao - 1]->nome);
+            Equipa* equipa_selecionada = lista_visivel[opcao - 1];
+            
+            /* Se e corporativo e equipa publica, verifica se precisa entrar */
+            if (tipo == CORPORATIVO && equipa_selecionada->tipo == PUBLICA) {
+                int ja_membro = 0;
+                MembroEquipa* verificar = equipa_selecionada->membros;
+                while (verificar) {
+                    if (strcmp(verificar->email, email) == 0) {
+                        ja_membro = 1;
+                        break;
+                    }
+                    verificar = verificar->prox;
+                }
+                
+                if (!ja_membro) {
+                    printf("\n[INFO] Entrando automaticamente na equipa publica '%s'...\n", equipa_selecionada->nome);
+                    if (adicionar_membro_equipa(equipa_selecionada, email)) {
+                        salvar_todas_equipas(eqs);
+                        printf("[SUCESSO] Voce agora e membro da equipa!\n");
+                    }
+                    Sleep(2000);
+                }
+            }
+            
+            sprintf(titulo, "MEMBROS DA EQUIPA: %s", equipa_selecionada->nome);
             imprimir_cabecalho(titulo);
-            listar_membros_equipa(lista_visivel[opcao - 1]);
+            listar_membros_equipa(equipa_selecionada);
             imprimir_separador();
             printf("Pressione qualquer tecla para continuar...");
             getch();
