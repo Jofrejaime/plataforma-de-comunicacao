@@ -400,6 +400,8 @@ void menu_convidado(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
     Equipa* eq;
     int encontrou;
     
+    (void)g; /* Suprime warning de parametro nao usado */
+    
     m = buscar_membro(ht, usuario);
     do {
         sprintf(titulo, "MENU CONVIDADO - Usuario: %s", usuario);

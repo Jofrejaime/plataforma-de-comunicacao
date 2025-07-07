@@ -4,8 +4,10 @@
 
 // Cria um novo membro. Retorna NULL em caso de erro de alocação.
 Membro* criar_membro(const char* email, const char* senha, TipoMembro tipo, int salvar) {
+    Membro* novo;
+    (void)salvar; /* Suprime warning de parametro nao usado */
     if (!email || !senha) return NULL;
-    Membro* novo = (Membro*)malloc(sizeof(Membro));
+    novo = (Membro*)malloc(sizeof(Membro));
     if (!novo) return NULL;
     strcpy(novo->email, email);
     strcpy(novo->senha, senha);
