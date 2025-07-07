@@ -114,6 +114,10 @@ int enviar_mensagem(HashTable* ht, Grafo* g, const char* origem, const char* des
     if (!remetente || !remetente->ativo) return 0;
     receptor = buscar_membro(ht, destino);
     if (!receptor && !buscar_vertice(g, destino)) return 0;
+    
+    /* Verifica se o destinatário bloqueou o remetente */
+    if (receptor && esta_bloqueado(receptor, origem)) return 0;
+    
     if (!registrar_comunicacao(g, origem, destino, conteudo)) return 0;
     return 1;
 }

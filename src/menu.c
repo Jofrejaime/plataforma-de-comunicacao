@@ -41,8 +41,9 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
         "2. Ver equipas",
         "3. Enviar documento",
         "4. Convidar membro",
-        "5. Listar meus documentos",
-        "6. Visualizar meu perfil",
+        "6. Listar meus documentos",
+        "7. Visualizar meu perfil",
+        "9. Bloquear/Desbloquear membro",
         "0. Sair",
         NULL
     };
@@ -106,7 +107,7 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
                 if (ok)
                     mensagem_sucesso("Mensagem enviada com sucesso!");
                 else
-                    mensagem_erro("Falha ao enviar. Destinatário pode estar inativo.");
+                    mensagem_erro("Falha ao enviar. Destinatario inativo ou voce foi bloqueado.");
             } else {
                 mensagem_erro("Destinatário não encontrado! Verifique o email ou nome da equipa.");
                 continue;
@@ -139,13 +140,42 @@ void menu_mensagens(HashTable* ht, Grafo* g, const char* usuario, ListaEquipas* 
             } else {
                 mensagem_erro("Falha ao criar convite! Email pode ja existir.");
             }
-        } else if (opcao == 5) {
+        } else if (opcao == 9) {
+            imprimir_cabecalho("BLOQUEAR/DESBLOQUEAR MEMBRO");
+            printf("1. Bloquear membro\n");
+            printf("2. Desbloquear membro\n");
+            printf("Escolha uma opcao:\n> ");
+            scanf("%d", &ok);
+            getchar();
+            
+            if (ok == 1) {
+                printf("Digite o email do membro a bloquear:\n> ");
+                fgets(destino, sizeof(destino), stdin);
+                destino[strcspn(destino, "\n")] = 0;
+                
+                if (bloquear_membro(m, destino)) {
+                    mensagem_sucesso("Membro bloqueado com sucesso!");
+                } else {
+                    mensagem_erro("Falha ao bloquear! Membro pode ja estar bloqueado.");
+                }
+            } else if (ok == 2) {
+                printf("Digite o email do membro a desbloquear:\n> ");
+                fgets(destino, sizeof(destino), stdin);
+                destino[strcspn(destino, "\n")] = 0;
+                
+                if (desbloquear_membro(m, destino)) {
+                    mensagem_sucesso("Membro desbloqueado com sucesso!");
+                } else {
+                    mensagem_erro("Falha ao desbloquear! Membro pode nao estar bloqueado.");
+                }
+            }
+        } else if (opcao == 6) {
             imprimir_cabecalho("MEUS DOCUMENTOS");
             listar_documentos(usuario);
             imprimir_separador();
             printf("Pressione qualquer tecla para voltar ao menu...");
             getch();
-        } else if (opcao == 6) {
+        } else if (opcao == 7) {
             imprimir_cabecalho("MEU PERFIL");
             printf("Email: %s\n", m->email);
             printf("Tipo: %s\n", m->tipo == 0 ? "ADMINISTRADOR" : (m->tipo == 1 ? "CORPORATIVO" : "CONVIDADO"));

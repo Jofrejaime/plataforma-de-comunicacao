@@ -18,14 +18,21 @@ typedef struct Documento {
     struct Documento* prox;
 } Documento;
 
+// Estrutura para lista de bloqueados
+typedef struct Bloqueado {
+    char email[100];
+    struct Bloqueado* prox;
+} Bloqueado;
+
 // Estrutura para membro
 typedef struct Membro {
     char email[100];
     char senha[50];
     TipoMembro tipo;
     int ativo;
-    int permissao[3]; // Corrigido nome do campo
+    int permissao[3];
     Documento* documentos;
+    Bloqueado* bloqueados; // lista de membros bloqueados
     struct Membro* prox; // para encadeamento da hash
 } Membro;
 
@@ -35,5 +42,9 @@ Membro* criar_membro(const char* email, const char* senha, TipoMembro tipo, int 
 void imprimir_membro(Membro* membro);
 // Libera memória de um membro e seus documentos
 void liberar_membro(Membro* membro);
+// Funções de bloqueio
+int bloquear_membro(Membro* bloqueador, const char* email_bloqueado);
+int desbloquear_membro(Membro* bloqueador, const char* email_desbloqueado);
+int esta_bloqueado(Membro* membro, const char* email_verificar);
 
 #endif
